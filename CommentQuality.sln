@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2035
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommenQuality", "CommenQuality\CommenQuality.csproj", "{F0E49D64-0B94-4CD5-BAA3-57C13260C368}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommentQuality", "CommentQuality\CommentQuality.csproj", "{F0E49D64-0B94-4CD5-BAA3-57C13260C368}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
