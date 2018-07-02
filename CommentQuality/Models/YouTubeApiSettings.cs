@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CommenQuality.Models
+﻿namespace CommentQuality.Models
 {
-    class YouTubeApiSettings
+    internal class YouTubeApiSettings
     {
         public string ApiKey { get; set; }
     }
