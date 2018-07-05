@@ -1,3 +1,5 @@
+using CommentQuality.Interfaces;
+using CommentQuality.Services;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Microsoft.AspNetCore.Http;
@@ -14,7 +16,7 @@ namespace CommentQuality
     public static class Api
     {
         [FunctionName("GetComments")]
-        public static async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "youtube/comments/{videoId}")]
+        public static IActionResult Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "youtube/comments/{videoId}")]
             HttpRequest req,
             ExecutionContext context,
             TraceWriter log,
@@ -22,7 +24,7 @@ namespace CommentQuality
         {
             log.Info($"C# HTTP trigger function processed a request. - {videoId}");
 
-            await hae(context, log);
+            hae(context, log);
 
             string name = req.Query["name"];
 
@@ -31,57 +33,30 @@ namespace CommentQuality
             name = name ?? data?.name;
 
             return name != null
-                ? (ActionResult) new OkObjectResult($"Hello, {name}")
+                ? (ActionResult)new OkObjectResult($"Hello, {name}")
                 : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
         }
 
-        private static async Task hae(ExecutionContext context, TraceWriter log)
+        private static void hae(ExecutionContext context, TraceWriter log)
         {
             var appSettings = new AppSettings(context);
+            IYouTubeDataApi youtubeDataApi = new YouTubeDataApi(appSettings.YouTubeApiSettings);
 
-            var youTubeService = new YouTubeService(new BaseClientService.Initializer()
-            {
-                ApiKey = appSettings.YouTubeApiSettings.ApiKey,
-                ApplicationName = "CommentQuality"
-            });
+            var commentThreadIterator = new CommentThreadIterator(youtubeDataApi);
+            var commentIterator = new CommentIterator(youtubeDataApi);
 
-            string nextCommentThreadsBatchToken = null;
-            string nextCommentsBatchToken = null;
             var commentIdx = 0;
-            do
+            foreach (var commentThread in commentThreadIterator.GetCommentThreads("snippet,replies", "5iltz8JTRKw"))
             {
-                var listReq = youTubeService.CommentThreads.List("snippet,replies");
-                listReq.VideoId = "5iltz8JTRKw";
-                listReq.PageToken = nextCommentThreadsBatchToken;
-
-                var resp = await listReq.ExecuteAsync();
-                nextCommentThreadsBatchToken = resp.NextPageToken != nextCommentThreadsBatchToken ? resp.NextPageToken : string.Empty;
-
-                foreach (var commentThread in resp.Items)
+                commentIdx++;
+                log.Info($"{commentIdx} --- {commentThread.Snippet.TopLevelComment.Snippet.TextOriginal}");
+                foreach (var comment in commentIterator.GetComments("snippet", commentThread.Id, CommentsResource.ListRequest.TextFormatEnum.PlainText))
                 {
                     commentIdx++;
-                    log.Info($"{commentIdx} Top Level Comment: {commentThread.Snippet.TopLevelComment.Snippet.TextOriginal}");
-
-                    do
-                    {
-                        var commentListReq = youTubeService.Comments.List("snippet");
-                        commentListReq.ParentId = commentThread.Id;
-                        commentListReq.TextFormat = CommentsResource.ListRequest.TextFormatEnum.PlainText;
-                        commentListReq.PageToken = nextCommentsBatchToken;
-
-                        var comments = await commentListReq.ExecuteAsync();
-                        nextCommentsBatchToken = comments.NextPageToken != nextCommentThreadsBatchToken ? comments.NextPageToken : null;
-
-                        foreach (var commentsItem in comments.Items)
-                        {
-                            commentIdx++;
-                            log.Info($"{commentIdx}     {commentsItem.Snippet.TextOriginal}");
-                        }
-                    } while (nextCommentsBatchToken != null);
-
-                    log.Info("");
+                    log.Info($"{commentIdx} - {comment.Snippet.TextOriginal}");
                 }
-            } while (nextCommentThreadsBatchToken != null);
+                log.Info("\n");
+            }
         }
     }
 }
