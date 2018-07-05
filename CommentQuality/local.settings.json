@@ -1,9 +1,9 @@
 ﻿{
   "IsEncrypted": false,
   "Values": {
-    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=commentquality;AccountKey=lNwDCDxWInp1mIEtFv2HohYwYNHH9BrA/U4rUJnJI4KCNzPv9TXE702+5OD9QifSZ163zNDlpNPEhkKlJk97vA==",
-    "AzureWebJobsDashboard": "DefaultEndpointsProtocol=https;AccountName=commentquality;AccountKey=lNwDCDxWInp1mIEtFv2HohYwYNHH9BrA/U4rUJnJI4KCNzPv9TXE702+5OD9QifSZ163zNDlpNPEhkKlJk97vA==",
-    "YTApiKey": "AIzaSyBtlkyucOsTpoxvanHAhrEfNmA0WwyIphU"
+    "AzureWebJobsStorage": "<YourStuffHere>",
+    "AzureWebJobsDashboard": "<YourStuffHereToo>",
+    "YTApiKey": "<GuessWhatYourStuffHere>"
   },
   "Host": {
     "LocalHttpPort": 7071,
