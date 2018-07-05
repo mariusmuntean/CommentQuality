@@ -1,6 +1,6 @@
 ﻿namespace CommentQuality.Models
 {
-    internal class YouTubeApiSettings
+    public class YouTubeApiSettings
     {
         public string ApiKey { get; set; }
     }
