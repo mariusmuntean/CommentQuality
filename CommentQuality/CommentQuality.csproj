@@ -21,10 +21,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Interfaces\" />
-    <Folder Include="Services\" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Remove="Processors\CommentProcessor.cs" />
     <Compile Remove="Processors\CommentThreadListProcessor.cs" />
   </ItemGroup>

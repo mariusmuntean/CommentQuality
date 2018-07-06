@@ -4,7 +4,7 @@ using Google.Apis.YouTube.v3.Data;
 
 namespace CommentQuality.Services
 {
-    public class CommentThreadIterator
+    public class CommentThreadIterator : ICommentThreadIterator
     {
         private readonly IYouTubeDataApi _youTubeDataApi;
         string nextCommentThreadsBatchToken = null;
@@ -13,7 +13,6 @@ namespace CommentQuality.Services
         {
             _youTubeDataApi = youTubeDataApi;
         }
-
 
         public IEnumerable<CommentThread> GetCommentThreads(string part, string videoId)
         {

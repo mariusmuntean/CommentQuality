@@ -5,9 +5,8 @@ using static Google.Apis.YouTube.v3.CommentsResource.ListRequest;
 
 namespace CommentQuality.Services
 {
-    public class CommentIterator
+    public class CommentIterator : ICommentIterator
     {
-
         string nextCommentsBatchToken = null;
         private readonly IYouTubeDataApi _youTubeDataApi;
 

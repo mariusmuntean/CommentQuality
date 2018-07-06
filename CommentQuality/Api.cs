@@ -9,7 +9,9 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using CommentQuality.Models;
 
 namespace CommentQuality
 {
@@ -24,7 +26,7 @@ namespace CommentQuality
         {
             log.Info($"C# HTTP trigger function processed a request. - {videoId}");
 
-            hae(context, log);
+            hae(context, log, videoId);
 
             string name = req.Query["name"];
 
@@ -33,29 +35,30 @@ namespace CommentQuality
             name = name ?? data?.name;
 
             return name != null
-                ? (ActionResult)new OkObjectResult($"Hello, {name}")
+                ? (ActionResult) new OkObjectResult($"Hello, {name}")
                 : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
         }
 
-        private static void hae(ExecutionContext context, TraceWriter log)
+        private static void hae(ExecutionContext context, TraceWriter log, string videoId)
         {
+            // ToDo: kinda slow for 10k comments. Consider using Durable Functions to split up the work
+
             var appSettings = new AppSettings(context);
             IYouTubeDataApi youtubeDataApi = new YouTubeDataApi(appSettings.YouTubeApiSettings);
 
             var commentThreadIterator = new CommentThreadIterator(youtubeDataApi);
             var commentIterator = new CommentIterator(youtubeDataApi);
 
-            var commentIdx = 0;
-            foreach (var commentThread in commentThreadIterator.GetCommentThreads("snippet,replies", "5iltz8JTRKw"))
+            var batchedCommentsProvider = new BatchedCommentsProvider(new BatchedCommentsProviderConfig(10, 10000, document => !string.IsNullOrWhiteSpace(document.Text)), new CommentProvider(commentThreadIterator, commentIterator));
+            batchedCommentsProvider.Init(videoId);
+
+            DocumentBatch docBatch;
+            while ((docBatch = batchedCommentsProvider.GetNextDocumentBatch()).Documents.Any())
             {
-                commentIdx++;
-                log.Info($"{commentIdx} --- {commentThread.Snippet.TopLevelComment.Snippet.TextOriginal}");
-                foreach (var comment in commentIterator.GetComments("snippet", commentThread.Id, CommentsResource.ListRequest.TextFormatEnum.PlainText))
+                foreach (var docBatchDocument in docBatch.Documents)
                 {
-                    commentIdx++;
-                    log.Info($"{commentIdx} - {comment.Snippet.TextOriginal}");
+                    log.Info($"{docBatchDocument.Id} - {docBatchDocument.Text}");
                 }
-                log.Info("\n");
             }
         }
     }
