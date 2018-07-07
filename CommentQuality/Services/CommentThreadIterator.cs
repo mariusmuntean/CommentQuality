@@ -20,7 +20,7 @@ namespace CommentQuality.Services
             {
                 var listReq = _youTubeDataApi.GetCommentThreadListRequest(part, videoId, nextCommentThreadsBatchToken);
                 var resp = listReq.ExecuteAsync().GetAwaiter().GetResult();
-                nextCommentThreadsBatchToken = resp.NextPageToken != nextCommentThreadsBatchToken ? resp.NextPageToken : string.Empty;
+                nextCommentThreadsBatchToken = resp.NextPageToken != nextCommentThreadsBatchToken ? resp.NextPageToken : null;
 
                 foreach (var commentThread in resp.Items)
                 {
