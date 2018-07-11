@@ -20,7 +20,7 @@ namespace CommentQuality.Services
             do
             {
                 var commentListReq = _youTubeDataApi.GetCommentListRequest(part, parentId, textFormat, nextCommentsBatchToken);
-
+                commentListReq.MaxResults = 100;
                 var comments = commentListReq.ExecuteAsync().GetAwaiter().GetResult();
                 nextCommentsBatchToken = comments.NextPageToken != nextCommentsBatchToken ? comments.NextPageToken : null;
 

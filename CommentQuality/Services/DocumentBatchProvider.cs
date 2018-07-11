@@ -4,14 +4,14 @@ using Google.Apis.YouTube.v3.Data;
 
 namespace CommentQuality.Services
 {
-    class BatchedCommentsProvider
+    class DocumentBatchProvider
     {
         private readonly BatchedCommentsProviderConfig _providerConfig;
         private readonly ICommentProvider _commentProvider;
 
         private bool _initialized = false;
 
-        public BatchedCommentsProvider(BatchedCommentsProviderConfig providerConfig, ICommentProvider commentProvider)
+        public DocumentBatchProvider(BatchedCommentsProviderConfig providerConfig, ICommentProvider commentProvider)
         {
             _providerConfig = providerConfig;
             _commentProvider = commentProvider;
@@ -52,7 +52,7 @@ namespace CommentQuality.Services
         {
             if (!_initialized)
             {
-                throw new NotInitializedException("BatchedCommentsProvider not initialized");
+                throw new NotInitializedException("DocumentBatchProvider not initialized");
             }
         }
 

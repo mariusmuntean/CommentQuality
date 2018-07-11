@@ -1,38 +1,27 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using CommentQuality.Interfaces;
-using CommentQuality.Models;
 using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
 
 namespace CommentQuality.Services
 {
-    public class CommentProvider : ICommentProvider
+    public class CommentProvider2 : ICommentProvider2
     {
-        private readonly ICommentThreadIterator _commentThreadIterator;
+        private readonly ICommentThreadProvider _commentThreadProvider;
         private readonly ICommentIterator _commentIterator;
 
         private IEnumerator<Comment> _commentsIter;
         private Comment _peekNextComment;
 
-        private bool _initialized = false;
-
-        public CommentProvider(ICommentThreadIterator commentThreadIterator,
-            ICommentIterator commentIterator)
+        public CommentProvider2(ICommentThreadProvider commentThreadProvider, ICommentIterator commentIterator)
         {
-            _commentThreadIterator = commentThreadIterator;
+            _commentThreadProvider = commentThreadProvider;
             _commentIterator = commentIterator;
-        }
-
-        public void Init(string videoId)
-        {
-            _commentsIter = GetComments(videoId).GetEnumerator();
-            _initialized = true;
         }
 
         public Comment GetNextComment()
         {
-            AssertInit();
+            EnsureInitialized();
 
             if (_peekNextComment != null)
             {
@@ -67,27 +56,27 @@ namespace CommentQuality.Services
             return PeekNextComment != null;
         }
 
-        private IEnumerable<Comment> GetComments(string videoId)
+        private IEnumerable<Comment> GetComments()
         {
-            foreach (var commentThread in _commentThreadIterator.GetCommentThreads("snippet,replies", videoId))
+            CommentThread commentThread = null;
+            while ((commentThread = _commentThreadProvider.GetNextCommentThread()) != null)
             {
                 // Get the top comment
                 yield return commentThread.Snippet.TopLevelComment;
 
                 // Finally get the rest of the comment in the comment thread
-                foreach (var comment in _commentIterator.GetComments("snippet", commentThread.Id, CommentsResource.ListRequest.TextFormatEnum.PlainText))
+                foreach (var comment in _commentIterator.GetComments("snippet", commentThread.Id,
+                    CommentsResource.ListRequest.TextFormatEnum.PlainText))
                 {
                     yield return comment;
                 }
             }
         }
 
-        private void AssertInit()
+        private void EnsureInitialized()
         {
-            if (!_initialized)
-            {
-                throw new NotInitializedException("The comment provider was not initialized");
-            }
+            if (_commentsIter == null)
+                _commentsIter = GetComments().GetEnumerator();
         }
     }
 }
