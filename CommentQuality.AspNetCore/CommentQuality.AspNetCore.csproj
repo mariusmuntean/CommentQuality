@@ -10,6 +10,13 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" />
+    <PackageReference Include="Ooui.AspNetCore" Version="0.10.222" />
+    <PackageReference Include="Ooui.Forms" Version="0.10.222" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CommentQuality.OouiForms\CommentQuality.OouiForms.csproj" />
   </ItemGroup>
 
 </Project>

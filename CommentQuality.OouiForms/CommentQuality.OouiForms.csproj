@@ -4,4 +4,17 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Ooui.Forms" Version="0.10.222" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Comments.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="ViewCell1.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
 </Project>
