@@ -21,9 +21,9 @@ namespace CommentQuality.Services
             });
         }
 
-        public CommentThreadsResource.ListRequest GetCommentThreadListRequest(string part, string videoId, string pageToken)
+        public CommentThreadsResource.ListRequest GetCommentThreadListRequest(string part, string videoId,
+            string pageToken)
         {
-
             var listReq = _youTubeService.CommentThreads.List(part);
             listReq.VideoId = videoId;
             listReq.PageToken = pageToken;
@@ -31,7 +31,8 @@ namespace CommentQuality.Services
             return listReq;
         }
 
-        public CommentsResource.ListRequest GetCommentListRequest(string part, string parentId, CommentsResource.ListRequest.TextFormatEnum textFormat, string pageToken)
+        public CommentsResource.ListRequest GetCommentListRequest(string part, string parentId,
+            CommentsResource.ListRequest.TextFormatEnum textFormat, string pageToken)
         {
             var commentListReq = _youTubeService.Comments.List("snippet");
             commentListReq.ParentId = parentId;
@@ -39,6 +40,14 @@ namespace CommentQuality.Services
             commentListReq.PageToken = pageToken;
 
             return commentListReq;
+        }
+
+        public VideosResource.ListRequest GetVideoCommentCount(string videoId)
+        {
+            var videoStatsListRequest = _youTubeService.Videos.List("statistics");
+            videoStatsListRequest.Id = videoId;
+
+            return videoStatsListRequest;
         }
     }
 }

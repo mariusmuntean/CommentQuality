@@ -54,7 +54,7 @@ namespace CommentQuality
             var tasks = new List<Task>();
             int commentCount = 0;
             var dateTimeBeforeCounting = DateTime.Now;
-            for (int i = 0; i < 50; i++)
+            for (int i = 0; i < 100; i++)
             {
                 var newTask = Task.Run(() =>
                 {

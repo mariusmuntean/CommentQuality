@@ -1,4 +1,5 @@
-﻿using static Google.Apis.YouTube.v3.CommentsResource.ListRequest;
+﻿using Google.Apis.YouTube.v3;
+using static Google.Apis.YouTube.v3.CommentsResource.ListRequest;
 
 namespace CommentQuality.Interfaces
 {
@@ -11,7 +12,7 @@ namespace CommentQuality.Interfaces
         /// <param name="videoId">Identifies the video</param>
         /// <param name="pageToken">Identifies a specific page in the result set.</param>
         /// <returns>The comment thread list request.</returns>
-        Google.Apis.YouTube.v3.CommentThreadsResource.ListRequest GetCommentThreadListRequest(string part, string videoId, string pageToken);
+        CommentThreadsResource.ListRequest GetCommentThreadListRequest(string part, string videoId, string pageToken);
 
         /// <summary>
         /// Creates a ListRequest for the Comments in a CommentThread of a video
@@ -21,6 +22,8 @@ namespace CommentQuality.Interfaces
         /// <param name="textFormat">Indicates whether the API should retrun the comments as HTML or plain text</param>
         /// <param name="pageToken">Identifies a specific page in the result set.</param>
         /// <returns>The comment list request.</returns>
-        Google.Apis.YouTube.v3.CommentsResource.ListRequest GetCommentListRequest(string part, string parentId, TextFormatEnum textFormat, string pageToken);
+        CommentsResource.ListRequest GetCommentListRequest(string part, string parentId, TextFormatEnum textFormat, string pageToken);
+
+        VideosResource.ListRequest GetVideoCommentCount(string videoId);
     }
 }
