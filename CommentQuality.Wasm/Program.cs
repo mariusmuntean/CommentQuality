@@ -1,4 +1,7 @@
 ﻿using System;
+using CommentQuality.OouiForms;
+using Ooui;
+using Xamarin.Forms;
 
 namespace CommentQuality.Wasm
 {
@@ -6,7 +9,10 @@ namespace CommentQuality.Wasm
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Forms.Init();
+
+            UI.Port = 8901;
+            UI.Publish("/", new Comments().GetOouiElement());
         }
     }
 }

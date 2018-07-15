@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Ooui.Wasm" Version="0.10.222" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CommentQuality.OouiForms\CommentQuality.OouiForms.csproj" />
   </ItemGroup>
 
