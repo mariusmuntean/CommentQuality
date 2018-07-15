@@ -1,4 +1,4 @@
-﻿namespace CommentQuality.Models
+﻿namespace CommentQuality.RestApi.Models
 {
     public class YouTubeApiSettings
     {

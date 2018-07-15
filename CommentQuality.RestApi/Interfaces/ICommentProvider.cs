@@ -1,6 +1,6 @@
 ﻿using Google.Apis.YouTube.v3.Data;
 
-namespace CommentQuality.Interfaces
+namespace CommentQuality.RestApi.Interfaces
 {
     /// <summary>
     /// Provides comments for a certain YouTube video

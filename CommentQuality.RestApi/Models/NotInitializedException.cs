@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CommentQuality.Models
+namespace CommentQuality.RestApi.Models
 {
     public class NotInitializedException : Exception
     {

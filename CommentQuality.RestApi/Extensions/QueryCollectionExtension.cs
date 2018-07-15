@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace CommentQuality.Extensions
+namespace CommentQuality.RestApi.Extensions
 {
     public static class QueryCollectionExtension
     {

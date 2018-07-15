@@ -1,4 +1,4 @@
-﻿namespace CommentQuality.Models
+﻿namespace CommentQuality.RestApi.Models
 {
     /// <summary>
     /// A piece of text to be submitted to sentiment analysis

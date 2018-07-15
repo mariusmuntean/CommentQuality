@@ -1,9 +1,10 @@
-﻿using CommentQuality.Models;
-using Google.Apis.YouTube.v3.Data;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using CommentQuality.RestApi.Interfaces;
+using CommentQuality.RestApi.Models;
+using Google.Apis.YouTube.v3.Data;
 
-namespace CommentQuality.Services
+namespace CommentQuality.RestApi.Services
 {
     /// <summary>
     ///     Thread-safe <see cref="CommentThread" /> provider, designed to be shared by multiple workers

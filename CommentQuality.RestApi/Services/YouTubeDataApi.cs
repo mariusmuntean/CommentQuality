@@ -1,9 +1,9 @@
-﻿using CommentQuality.Interfaces;
-using CommentQuality.Models;
+﻿using CommentQuality.RestApi.Interfaces;
+using CommentQuality.RestApi.Models;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 
-namespace CommentQuality.Services
+namespace CommentQuality.RestApi.Services
 {
     public class YouTubeDataApi : IYouTubeDataApi
     {

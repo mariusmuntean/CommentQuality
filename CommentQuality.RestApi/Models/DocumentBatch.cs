@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace CommentQuality.Models
+namespace CommentQuality.RestApi.Models
 {
     /// <summary>
     /// A bunch of comments.

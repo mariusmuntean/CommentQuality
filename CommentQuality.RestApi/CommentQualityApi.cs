@@ -1,18 +1,17 @@
-using CommentQuality.Extensions;
-using CommentQuality.Interfaces;
-using CommentQuality.Services;
+using System.Linq;
+using System.Threading.Tasks;
+using CommentQuality.RestApi.Extensions;
+using CommentQuality.RestApi.Interfaces;
+using CommentQuality.RestApi.Services;
 using Google.Apis.YouTube.v3;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
-using System.Linq;
-using System.Threading.Tasks;
-using static Google.Apis.YouTube.v3.CommentThreadsResource;
 using ExecutionContext = Microsoft.Azure.WebJobs.ExecutionContext;
 
-namespace CommentQuality
+namespace CommentQuality.RestApi
 {
     public static class CommentQualityApi
     {
@@ -66,7 +65,7 @@ namespace CommentQuality
             var textFormatStr = request.Query.GetQueryParamValue("textFormat");
             CommentsResource.ListRequest.TextFormatEnum textFormat =
                 CommentsResource.ListRequest.TextFormatEnum.PlainText;
-            ListRequest.TextFormatEnum.TryParse(textFormatStr, out textFormat);
+            CommentThreadsResource.ListRequest.TextFormatEnum.TryParse(textFormatStr, out textFormat);
 
             var commentsListRequest = youTubeDataApi.GetCommentListRequest(part, parentId, textFormat, pageToken);
             var comments = await commentsListRequest.ExecuteAsync();

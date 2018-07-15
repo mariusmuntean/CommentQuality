@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using CommentQuality.Interfaces;
+using CommentQuality.RestApi.Interfaces;
+using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
-using static Google.Apis.YouTube.v3.CommentsResource.ListRequest;
 
-namespace CommentQuality.Services
+namespace CommentQuality.RestApi.Services
 {
     public class CommentIterator : ICommentIterator
     {
@@ -15,7 +15,7 @@ namespace CommentQuality.Services
             _youTubeDataApi = youTubeDataApi;
         }
 
-        public IEnumerable<Comment> GetComments(string part, string parentId, TextFormatEnum textFormat)
+        public IEnumerable<Comment> GetComments(string part, string parentId, CommentsResource.ListRequest.TextFormatEnum textFormat)
         {
             do
             {

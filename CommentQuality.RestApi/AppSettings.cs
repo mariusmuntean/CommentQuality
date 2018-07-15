@@ -1,8 +1,8 @@
-﻿using CommentQuality.Models;
+﻿using CommentQuality.RestApi.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 
-namespace CommentQuality
+namespace CommentQuality.RestApi
 {
     class AppSettings
     {

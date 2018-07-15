@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using CommentQuality.Interfaces;
+using CommentQuality.RestApi.Interfaces;
 using Google.Apis.YouTube.v3.Data;
 
-namespace CommentQuality.Services
+namespace CommentQuality.RestApi.Services
 {
     public class CommentThreadIterator : ICommentThreadIterator
     {

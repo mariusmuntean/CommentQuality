@@ -1,21 +1,21 @@
 using System;
-using CommentQuality.Interfaces;
-using CommentQuality.Models;
-using CommentQuality.Services;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using CommentQuality.RestApi.Interfaces;
+using CommentQuality.RestApi.Models;
+using CommentQuality.RestApi.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using ExecutionContext = Microsoft.Azure.WebJobs.ExecutionContext;
 
-namespace CommentQuality
+namespace CommentQuality.RestApi
 {
     public static class Api
     {
