@@ -1,4 +1,4 @@
-﻿using CommentQuality.OouiForms;
+﻿using CommentQuality.OouiForms.Views;
 using Microsoft.AspNetCore.Mvc;
 using Ooui.AspNetCore;
 using Xamarin.Forms;
@@ -9,9 +9,7 @@ namespace CommentQuality.AspNetCore.Controllers
     {
         public IActionResult Comments()
         {
-            
-            return new ElementResult(new Comments().GetOouiElement());
-
+            return new ElementResult(new HomePage().GetOouiElement());
         }
     }
 }

@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CommentQuality.OouiForms.Views.HomePage">
+    <ContentPage.Content>
+        <StackLayout Spacing="5">
+            <StackLayout Orientation="Horizontal"
+                         HorizontalOptions="CenterAndExpand"
+                         VerticalOptions="Start">
+                <Label Text="Video ID"
+                       VerticalOptions="CenterAndExpand"
+                       HorizontalOptions="CenterAndExpand" />
+                <Entry x:Name="entry"
+                       WidthRequest="300"
+                       HorizontalOptions="CenterAndExpand"
+                       VerticalOptions="Start" />
+            </StackLayout>
+            <Button Text="Go"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Start"
+                    Clicked="Button_OnClicked" />
+            <Editor x:Name="editor"
+                    WidthRequest="800"
+                    HorizontalOptions="CenterAndExpand"
+                    VerticalOptions="Start" />
+
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
