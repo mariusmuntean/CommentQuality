@@ -1,5 +1,7 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
+using Google.Apis.YouTube.v3.Data;
+using Newtonsoft.Json;
 
 namespace CommentQuality.OouiForms.Stuff
 {
@@ -22,13 +24,50 @@ namespace CommentQuality.OouiForms.Stuff
         private string _commentsFromThreadRoute =
             "/video/{parentId}/comments?part={part}&pageToken={pageToken}&textFormat={textFormat}";
 
+        private HttpClient _httpClient;
+
+        public RestApi()
+        {
+            _httpClient = new HttpClient();
+        }
+
         public async Task<string> GetCommentCount(string videoId)
         {
-            var httpClient = new HttpClient();
-            var requestUrl = _baseUrl + _commentCountRoute.Replace("{videoId}", videoId);
-            var response = await httpClient.GetAsync(requestUrl);
+            _httpClient = new HttpClient();
+            var requestUrl = _baseUrl + _commentCountRoute
+                                 .Replace("{videoId}", videoId);
+            var response = await _httpClient.GetAsync(requestUrl);
 
             return await response.Content.ReadAsStringAsync();
+        }
+
+        public async Task<CommentThreadListResponse> GetCommentThreads(string videoId, string part, string pageToken)
+        {
+            var requestUrl = _baseUrl + _commentThreadsRoute
+                                 .Replace("{videoId}", videoId)
+                                 .Replace("{part}", part)
+                                 .Replace("{pageToken}", pageToken);
+            var response = await _httpClient.GetAsync(requestUrl);
+
+            var responseStr = await response.Content.ReadAsStringAsync();
+
+            return JsonConvert.DeserializeObject<CommentThreadListResponse>(responseStr);
+        }
+
+        public async Task<CommentListResponse> GetCommentsFromThread(string parentId,
+            string part,
+            string textFormat,
+            string pageToken)
+        {
+            var requestUrl = _baseUrl + _commentsFromThreadRoute.Replace("{parentId}", parentId)
+                                 .Replace("{part}", part)
+                                 .Replace("{pageToken}", pageToken)
+                                 .Replace("{textFormat}", textFormat);
+
+            var response = await _httpClient.GetAsync(requestUrl);
+            var responseStr = await response.Content.ReadAsStringAsync();
+
+            return JsonConvert.DeserializeObject<CommentListResponse>(responseStr);
         }
     }
 }

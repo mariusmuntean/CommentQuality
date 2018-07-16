@@ -22,6 +22,7 @@
                     Clicked="Button_OnClicked" />
             <Editor x:Name="editor"
                     WidthRequest="800"
+                    HeightRequest="600"
                     HorizontalOptions="CenterAndExpand"
                     VerticalOptions="Start" />
 

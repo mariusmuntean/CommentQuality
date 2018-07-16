@@ -1,18 +1,17 @@
-﻿using System;
-using CommentQuality.OouiForms;
+﻿using CommentQuality.OouiForms.Views;
 using Ooui;
 using Xamarin.Forms;
 
 namespace CommentQuality.Wasm
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Forms.Init();
 
             UI.Port = 8901;
-            UI.Publish("/", new Comments().GetOouiElement());
+            UI.Publish("/", new HomePage().GetOouiElement());
         }
     }
 }
