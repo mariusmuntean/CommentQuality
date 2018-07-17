@@ -1,11 +1,12 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
+using CommentQuality.OouiForms.Interfaces;
 using Google.Apis.YouTube.v3.Data;
 using Newtonsoft.Json;
 
 namespace CommentQuality.OouiForms.Stuff
 {
-    internal class RestApi
+    internal class RestApi : IRestApi
     {
         /**
          * GetCommentCount: http://localhost:7071/api/video/{videoId}/commentCount
