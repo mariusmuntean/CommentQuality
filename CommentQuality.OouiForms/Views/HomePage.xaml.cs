@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Google.Apis.YouTube.v3;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using System.Collections.Immutable;
 
 namespace CommentQuality.OouiForms.Views
 {
@@ -18,6 +18,11 @@ namespace CommentQuality.OouiForms.Views
         public HomePage()
         {
             InitializeComponent();
+        }
+
+        private void ClearClicked(object sender, EventArgs e)
+        {
+            editor.Text = string.Empty;
         }
 
         private async void Button_OnClicked(object sender, EventArgs e)
@@ -48,7 +53,7 @@ namespace CommentQuality.OouiForms.Views
 
             //editor.Text += $"\n Total comment count = {totalCommentCount}";
 
-            await PublishCommentDocuments().ConfigureAwait(false);
+            await PublishCommentDocuments().ConfigureAwait(true);
         }
 
         public async Task PublishCommentDocuments()
@@ -61,7 +66,12 @@ namespace CommentQuality.OouiForms.Views
             var tasks = new List<Task>();
             int commentCount = 0;
             var dateTimeBeforeCounting = DateTime.Now;
-            for (int i = 0; i < 100; i++)
+
+            int minWorker, minIo;
+            ThreadPool.GetMinThreads(out minWorker, out minIo);
+            ThreadPool.SetMinThreads(4, minIo);
+
+            for (int i = 0; i < 10; i++)
             {
                 var newTask = Task.Run(() =>
                 {
@@ -69,29 +79,41 @@ namespace CommentQuality.OouiForms.Views
                     var commentProvider2 = new CommentProvider2(commentThreadProvider, commentIterator);
 
                     var docBatchProvider2 = new DocumentBatchProvider2(
-                        new BatchedCommentsProviderConfig(10, 10000,
+                        new BatchedCommentsProviderConfig(20, 10000,
                             document => !string.IsNullOrWhiteSpace(document.Text)),
                         commentProvider2
                     );
 
-                    DocumentBatch docBatch;
-                    while ((docBatch = docBatchProvider2.GetNextDocumentBatch()).Documents.Any())
+                    DocumentBatch docBatch = docBatchProvider2.GetNextDocumentBatch();
+                    while (docBatch.Documents.Any())
                     {
                         foreach (var docBatchDocument in docBatch.Documents)
                         {
-                            editor.Text += $"\n{docBatchDocument.Id} - {docBatchDocument.Text}";
+                            //AppendTextAndScroll($"{commentCount} - {docBatchDocument.Text}");
+
                             Interlocked.Increment(ref commentCount);
                         }
 
-                        editor.Text += $"\nComment count = {commentCount}";
+                        AppendTextAndScroll($"Comment count = {commentCount}");
+
+                        docBatch = docBatchProvider2.GetNextDocumentBatch();
                     }
+                    Console.WriteLine($"{Task.CurrentId} ended");
                 });
                 tasks.Add(newTask);
             }
 
             await Task.WhenAll(tasks).ConfigureAwait(true);
             var countDuration = DateTime.Now.Subtract(dateTimeBeforeCounting);
-            editor.Text += $"\nFinal comment count = {commentCount}, took {countDuration.TotalSeconds} seconds";
+            AppendTextAndScroll($"\nFinal comment count = {commentCount}, took {countDuration.TotalSeconds} seconds");
+        }
+
+        private void AppendTextAndScroll(string text)
+        {
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                editor.Text += $"{Environment.NewLine} {text}";
+            });
         }
     }
 }

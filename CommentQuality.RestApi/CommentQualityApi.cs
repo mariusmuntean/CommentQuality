@@ -45,6 +45,7 @@ namespace CommentQuality.RestApi
             var part = request.Query.GetQueryParamValue("part");
             var pageToken = request.Query.GetQueryParamValue("pageToken");
             var commentThreadListRequest = youtubeDataApi.GetCommentThreadListRequest(part, videoId, pageToken);
+            commentThreadListRequest.MaxResults = 100;
             var commentThreads = await commentThreadListRequest.ExecuteAsync();
             return new OkObjectResult(commentThreads);
         }
@@ -68,6 +69,7 @@ namespace CommentQuality.RestApi
             CommentThreadsResource.ListRequest.TextFormatEnum.TryParse(textFormatStr, out textFormat);
 
             var commentsListRequest = youTubeDataApi.GetCommentListRequest(part, parentId, textFormat, pageToken);
+            commentsListRequest.MaxResults = 100;
             var comments = await commentsListRequest.ExecuteAsync();
 
             return new OkObjectResult(comments);
