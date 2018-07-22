@@ -53,59 +53,84 @@ namespace CommentQuality.OouiForms.Views
 
             //editor.Text += $"\n Total comment count = {totalCommentCount}";
 
-            await PublishCommentDocuments().ConfigureAwait(true);
+            await ProcessComments().ConfigureAwait(true);
         }
 
-        public async Task PublishCommentDocuments()
+        //public async Task PublishCommentDocuments()
+        //{
+        //    var restApi = new RestApi();
+        //    var commentThreadIterator = new CommentThreadIterator(restApi);
+        //    var commentThreadProvider = new CommentThreadProvider(commentThreadIterator);
+        //    commentThreadProvider.Init(entry.Text, "snippet,replies");
+
+        //    var tasks = new List<Task>();
+        //    int commentCount = 0;
+        //    var dateTimeBeforeCounting = DateTime.Now;
+
+        //    //int minWorker, minIo;
+        //    //ThreadPool.GetMinThreads(out minWorker, out minIo);
+        //    //Console.WriteLine($"initial worker count = {minWorker}; initial IO handler count = {minIo}");
+        //    //ThreadPool.SetMinThreads(4, minIo);
+
+        //    for (int i = 0; i < 10; i++)
+        //    {
+        //        var newTask = Task.Run(() =>
+        //        {
+        //            var commentIterator = new CommentIterator(restApi);
+        //            var commentProvider2 = new CommentProvider2(commentThreadProvider, commentIterator);
+
+        //            var docBatchProvider2 = new DocumentBatchProvider2(
+        //                new BatchedCommentsProviderConfig(20, 10000,
+        //                    document => !string.IsNullOrWhiteSpace(document.Text)),
+        //                commentProvider2
+        //            );
+
+        //            DocumentBatch docBatch = docBatchProvider2.GetNextDocumentBatch();
+        //            while (docBatch.Documents.Any())
+        //            {
+        //                foreach (var docBatchDocument in docBatch.Documents)
+        //                {
+        //                    //AppendTextAndScroll($"{commentCount} - {docBatchDocument.Text}");
+
+        //                    Interlocked.Increment(ref commentCount);
+        //                }
+
+        //                AppendTextAndScroll($"Comment count = {commentCount}");
+
+        //                docBatch = docBatchProvider2.GetNextDocumentBatch();
+        //            }
+        //            Console.WriteLine($"{Task.CurrentId} ended");
+        //        });
+        //        tasks.Add(newTask);
+        //    }
+
+        //    await Task.WhenAll(tasks).ConfigureAwait(true);
+        //    var countDuration = DateTime.Now.Subtract(dateTimeBeforeCounting);
+        //    AppendTextAndScroll($"\nFinal comment count = {commentCount}, took {countDuration.TotalSeconds} seconds");
+        //}
+
+        public async Task ProcessComments()
         {
             var restApi = new RestApi();
             var commentThreadIterator = new CommentThreadIterator(restApi);
             var commentThreadProvider = new CommentThreadProvider(commentThreadIterator);
-            commentThreadProvider.Init(entry.Text, "snippet,replies");
 
-            var tasks = new List<Task>();
-            int commentCount = 0;
-            var dateTimeBeforeCounting = DateTime.Now;
-
-            int minWorker, minIo;
-            ThreadPool.GetMinThreads(out minWorker, out minIo);
-            ThreadPool.SetMinThreads(4, minIo);
-
-            for (int i = 0; i < 10; i++)
+            var commentProcessor = new CommentProcessor(restApi, commentThreadProvider, new DummyDocumentBatchSentimentAnalyzer());
+            var timeBeforeAnalysis = DateTime.UtcNow;
+            var totalAverage = 0.0d;
+            await commentProcessor.ProcessCommentsAsync(entry.Text, (CommentBatchResult commentBatchResult) =>
             {
-                var newTask = Task.Run(() =>
-                {
-                    var commentIterator = new CommentIterator(restApi);
-                    var commentProvider2 = new CommentProvider2(commentThreadProvider, commentIterator);
+                var docsInBatch = commentBatchResult.DocumentBatchSentiment.Documents.Count;
+                var batchSentiment = commentBatchResult.DocumentBatchSentiment.Documents.Sum((arg) => arg.Score) / docsInBatch;
+                var msg = $"Analyzed {commentBatchResult.ProcessedCommentCount} comments from {commentBatchResult.TotalCommentCount}. Average batch score is {batchSentiment}";
+                AppendTextAndScroll(msg);
 
-                    var docBatchProvider2 = new DocumentBatchProvider2(
-                        new BatchedCommentsProviderConfig(20, 10000,
-                            document => !string.IsNullOrWhiteSpace(document.Text)),
-                        commentProvider2
-                    );
+                totalAverage += commentBatchResult.DocumentBatchSentiment.Documents.Sum((arg) => arg.Score) / docsInBatch;
+            });
 
-                    DocumentBatch docBatch = docBatchProvider2.GetNextDocumentBatch();
-                    while (docBatch.Documents.Any())
-                    {
-                        foreach (var docBatchDocument in docBatch.Documents)
-                        {
-                            //AppendTextAndScroll($"{commentCount} - {docBatchDocument.Text}");
-
-                            Interlocked.Increment(ref commentCount);
-                        }
-
-                        AppendTextAndScroll($"Comment count = {commentCount}");
-
-                        docBatch = docBatchProvider2.GetNextDocumentBatch();
-                    }
-                    Console.WriteLine($"{Task.CurrentId} ended");
-                });
-                tasks.Add(newTask);
-            }
-
-            await Task.WhenAll(tasks).ConfigureAwait(true);
-            var countDuration = DateTime.Now.Subtract(dateTimeBeforeCounting);
-            AppendTextAndScroll($"\nFinal comment count = {commentCount}, took {countDuration.TotalSeconds} seconds");
+            var duration = DateTime.UtcNow.Subtract(timeBeforeAnalysis);
+            AppendTextAndScroll($"Average sentiment score is {totalAverage:0.####}");
+            AppendTextAndScroll($"Sentiment analysis took {duration.TotalSeconds:0.##} seconds");
         }
 
         private void AppendTextAndScroll(string text)

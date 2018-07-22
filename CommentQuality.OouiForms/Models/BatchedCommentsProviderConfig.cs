@@ -2,7 +2,7 @@
 
 namespace CommentQuality.OouiForms.Models
 {
-    class BatchedCommentsProviderConfig
+    public class BatchedCommentsProviderConfig
     {
         public int MaxDocumentCountPerbatch { get; }
         public int MaxTotalDocumentTextLengthPerBatch { get; }

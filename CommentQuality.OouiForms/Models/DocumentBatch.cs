@@ -6,7 +6,7 @@ namespace CommentQuality.OouiForms.Models
     /// <summary>
     /// A bunch of comments.
     /// </summary>
-    internal class DocumentBatch
+    public class DocumentBatch
     {
         private List<Document> _documents = new List<Document>();
 

@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace CommentQuality.OouiForms.Stuff
 {
-    internal class RestApi : IRestApi
+    public class RestApi : IRestApi
     {
         /**
          * GetCommentCount: http://localhost:7071/api/video/{videoId}/commentCount

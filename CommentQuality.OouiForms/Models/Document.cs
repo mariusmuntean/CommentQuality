@@ -1,9 +1,9 @@
 ﻿namespace CommentQuality.OouiForms.Models
 {
     /// <summary>
-    /// A piece of text to be submitted to sentiment analysis
+    /// A piece of text to be submitted for sentiment analysis
     /// </summary>
-    internal class Document
+    public class Document
     {
         /// <summary>
         /// Simple identifier

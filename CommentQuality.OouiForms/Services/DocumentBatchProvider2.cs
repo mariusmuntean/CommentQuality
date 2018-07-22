@@ -4,7 +4,7 @@ using Google.Apis.YouTube.v3.Data;
 
 namespace CommentQuality.OouiForms.Services
 {
-    internal class DocumentBatchProvider2
+    public class DocumentBatchProvider2
     {
         private readonly BatchedCommentsProviderConfig _providerConfig;
         private readonly ICommentProvider2 _commentProvider2;

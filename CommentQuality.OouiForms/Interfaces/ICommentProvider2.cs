@@ -5,7 +5,7 @@ namespace CommentQuality.OouiForms.Interfaces
     /// <summary>
     /// Provides comments for a certain YouTube video
     /// </summary>
-    internal interface ICommentProvider2
+    public interface ICommentProvider2
     {
         /// <summary>
         /// Gets the next comment. Calling this method repeatedly will return a new <see cref="Comment"/> every time or null if no more comments are available.
