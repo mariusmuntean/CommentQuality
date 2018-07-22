@@ -9,7 +9,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
+using static Google.Apis.YouTube.v3.CommentsResource.ListRequest;
 using ExecutionContext = Microsoft.Azure.WebJobs.ExecutionContext;
+using Microsoft.Azure.CognitiveServices.Language.TextAnalytics.Models;
+using System.Net.Security;
+using Microsoft.Azure.CognitiveServices.Language.TextAnalytics;
+using CommentQuality.RestApi.Models;
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net.Http;
 
 namespace CommentQuality.RestApi
 {
@@ -64,15 +73,70 @@ namespace CommentQuality.RestApi
             var part = request.Query.GetQueryParamValue("part");
             var pageToken = request.Query.GetQueryParamValue("pageToken");
             var textFormatStr = request.Query.GetQueryParamValue("textFormat");
-            CommentsResource.ListRequest.TextFormatEnum textFormat =
-                CommentsResource.ListRequest.TextFormatEnum.PlainText;
-            CommentThreadsResource.ListRequest.TextFormatEnum.TryParse(textFormatStr, out textFormat);
+            TextFormatEnum textFormat = TextFormatEnum.PlainText;
+            TextFormatEnum.TryParse(textFormatStr, out textFormat);
 
             var commentsListRequest = youTubeDataApi.GetCommentListRequest(part, parentId, textFormat, pageToken);
             commentsListRequest.MaxResults = 100;
             var comments = await commentsListRequest.ExecuteAsync();
 
             return new OkObjectResult(comments);
+        }
+
+        private static ITextAnalyticsClient _textAnalyticsClient;
+
+        [FunctionName("GetTextSentiment_Azure")]
+        public static async Task<IActionResult> GetTextSentimentAzure(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "text/sentiment/azure")]HttpRequest request,
+            TraceWriter traceWriter,
+            ExecutionContext executionContext
+        )
+        {
+            var appsettings = new AppSettings(executionContext);
+            var azureCognitiveServicesConfig = appsettings.AzureCognitiveServicesConfig;
+
+            _textAnalyticsClient = _textAnalyticsClient ?? GetTextAnalyticsClient(azureCognitiveServicesConfig);
+
+            var documentBatch = JsonConvert.DeserializeObject<DocumentBatch>(await GetBodyAsString(request));
+
+            var documents = documentBatch.Documents.Select((Document doc) => new MultiLanguageInput
+            {
+                Id = doc.Id,
+                Language = doc.LanguageCode,
+                Text = doc.Text
+            }).ToList();
+
+            try
+            {
+                var result = await _textAnalyticsClient.SentimentAsync(new MultiLanguageBatchInput(documents));
+
+                return new OkObjectResult(result);
+            }
+            catch (Exception ex)
+            {
+                string error = ex.ToString() + ex.InnerException?.ToString();
+                traceWriter.Error(error, ex);
+                return new BadRequestObjectResult(error);
+            }
+        }
+
+
+        private static async Task<string> GetBodyAsString(HttpRequest request)
+        {
+            var bodyStr = string.Empty;
+            using (var bodyStreamReader = new StreamReader(request.Body))
+            {
+                bodyStr = await bodyStreamReader.ReadToEndAsync();
+            }
+            return bodyStr;
+        }
+
+        private static ITextAnalyticsClient GetTextAnalyticsClient(AzureCognitiveServicesConfig config)
+        {
+            var textAnalyticsClient = new TextAnalyticsClient(new ApiKeyServiceClientCredentials(config.ApiKey));
+            textAnalyticsClient.BaseUri = new Uri(config.EndpointUrl);
+
+            return textAnalyticsClient;
         }
     }
 }

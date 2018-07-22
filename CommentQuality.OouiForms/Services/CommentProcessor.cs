@@ -53,6 +53,10 @@ namespace CommentQuality.OouiForms.Services
                     while (docBatch.Documents.Any())
                     {
                         Interlocked.Add(ref commentCount, docBatch.Documents.Count);
+
+                        // ToDo: add intermediate step to detect the Text Language, for now assume it is EN
+                        docBatch.Documents.ForEach((doc) => doc.LanguageCode = "en");
+
                         var analysisResult = await documentBatchSentimentAnalyzer.AnalyzeDocumentBatchAsync(docBatch);
 
                         onCommentBatchResult.Invoke(new CommentBatchResult()

@@ -19,9 +19,18 @@ namespace CommentQuality.RestApi
 
         public string YouTubeDataApiKey => _configurationRoot["YTApiKey"];
 
+        public string AzureCognitiveServicesApiKey => _configurationRoot["AzureCognitiveServicesApiKey"];
+        public string AzureCognitiveServicesEndpointUrl => _configurationRoot["AzureCognitiveServicesEndpointUrl"];
+
         public YouTubeApiSettings YouTubeApiSettings => new YouTubeApiSettings
         {
             ApiKey = YouTubeDataApiKey
+        };
+
+        public AzureCognitiveServicesConfig AzureCognitiveServicesConfig => new AzureCognitiveServicesConfig
+        {
+            ApiKey = AzureCognitiveServicesApiKey,
+            EndpointUrl = AzureCognitiveServicesEndpointUrl
         };
     }
 }

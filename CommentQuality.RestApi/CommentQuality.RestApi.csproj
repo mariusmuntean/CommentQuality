@@ -7,6 +7,7 @@
     <PackageReference Include="Google.Apis.YouTube.v3" Version="1.34.0.1226" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.14" />
     <PackageReference Include="RestSharp" Version="106.3.1" />
+    <PackageReference Include="Microsoft.Azure.CognitiveServices.Language.TextAnalytics" Version="2.0.0-preview" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
@@ -22,5 +23,6 @@
   <ItemGroup>
     <Compile Remove="Processors\CommentProcessor.cs" />
     <Compile Remove="Processors\CommentThreadListProcessor.cs" />
+    <Compile Remove="Interfaces\IDocumentBatchSentimentAnalyzer.cs" />
   </ItemGroup>
 </Project>

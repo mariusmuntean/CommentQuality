@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using System.Collections.Immutable;
+using CommentQuality.OouiForms.Interfaces;
 
 namespace CommentQuality.OouiForms.Views
 {
@@ -115,9 +116,10 @@ namespace CommentQuality.OouiForms.Views
             var commentThreadIterator = new CommentThreadIterator(restApi);
             var commentThreadProvider = new CommentThreadProvider(commentThreadIterator);
 
-            var commentProcessor = new CommentProcessor(restApi, commentThreadProvider, new DummyDocumentBatchSentimentAnalyzer());
+            var commentProcessor = new CommentProcessor(restApi, commentThreadProvider, NewSentimentAnalyzer(restApi));
             var timeBeforeAnalysis = DateTime.UtcNow;
-            var totalAverage = 0.0d;
+            var averagesSummed = 0.0d;
+            var processedCommentsCount = 0;
             await commentProcessor.ProcessCommentsAsync(entry.Text, (CommentBatchResult commentBatchResult) =>
             {
                 var docsInBatch = commentBatchResult.DocumentBatchSentiment.Documents.Count;
@@ -125,12 +127,22 @@ namespace CommentQuality.OouiForms.Views
                 var msg = $"Analyzed {commentBatchResult.ProcessedCommentCount} comments from {commentBatchResult.TotalCommentCount}. Average batch score is {batchSentiment}";
                 AppendTextAndScroll(msg);
 
-                totalAverage += commentBatchResult.DocumentBatchSentiment.Documents.Sum((arg) => arg.Score) / docsInBatch;
+                averagesSummed += commentBatchResult.DocumentBatchSentiment.Documents.Sum((arg) => arg.Score);
+                processedCommentsCount += commentBatchResult.DocumentBatchSentiment.Documents.Count;
             });
 
             var duration = DateTime.UtcNow.Subtract(timeBeforeAnalysis);
-            AppendTextAndScroll($"Average sentiment score is {totalAverage:0.####}");
+            await Task.Delay(500);
+            AppendTextAndScroll($"Average sentiment score is {(averagesSummed / processedCommentsCount):0.####}");
+            await Task.Delay(500);
             AppendTextAndScroll($"Sentiment analysis took {duration.TotalSeconds:0.##} seconds");
+        }
+
+        private static IDocumentBatchSentimentAnalyzer NewSentimentAnalyzer(RestApi restApi)
+        {
+            //return new DummyDocumentBatchSentimentAnalyzer();
+
+            return new AzureCognitiveServicesDocumentBatchSentimentAnalyzer(restApi);
         }
 
         private void AppendTextAndScroll(string text)
