@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
-namespace CommentQuality.OouiForms.Models
+namespace CommentQuality.Shared
 {
     public class DocumentSentiment
     {

@@ -5,11 +5,13 @@ VisualStudioVersion = 15.0.27703.2035
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommentQuality.RestApi", "CommentQuality.RestApi\CommentQuality.RestApi.csproj", "{F0E49D64-0B94-4CD5-BAA3-57C13260C368}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommentQuality.AspNetCore", "CommentQuality.AspNetCore\CommentQuality.AspNetCore.csproj", "{80AD166D-C437-4D56-9810-4E7A03891AE4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommentQuality.AspNetCore", "CommentQuality.AspNetCore\CommentQuality.AspNetCore.csproj", "{80AD166D-C437-4D56-9810-4E7A03891AE4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommentQuality.Wasm", "CommentQuality.Wasm\CommentQuality.Wasm.csproj", "{1BC462AF-9514-4962-9153-7E0A2EEC23C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommentQuality.Wasm", "CommentQuality.Wasm\CommentQuality.Wasm.csproj", "{1BC462AF-9514-4962-9153-7E0A2EEC23C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommentQuality.OouiForms", "CommentQuality.OouiForms\CommentQuality.OouiForms.csproj", "{82C29D45-696D-4C39-82A7-8AED1218A86E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommentQuality.OouiForms", "CommentQuality.OouiForms\CommentQuality.OouiForms.csproj", "{82C29D45-696D-4C39-82A7-8AED1218A86E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommentQuality.Shared", "CommentQuality.Shared\CommentQuality.Shared.csproj", "{152139B5-D8C0-4EB8-BEA9-F2678D416D4D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{82C29D45-696D-4C39-82A7-8AED1218A86E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{82C29D45-696D-4C39-82A7-8AED1218A86E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{82C29D45-696D-4C39-82A7-8AED1218A86E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{152139B5-D8C0-4EB8-BEA9-F2678D416D4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{152139B5-D8C0-4EB8-BEA9-F2678D416D4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{152139B5-D8C0-4EB8-BEA9-F2678D416D4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{152139B5-D8C0-4EB8-BEA9-F2678D416D4D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

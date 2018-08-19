@@ -1,11 +1,10 @@
-﻿using System.Net.Http;
-using System.Threading.Tasks;
-using CommentQuality.OouiForms.Interfaces;
+﻿using CommentQuality.OouiForms.Interfaces;
+using CommentQuality.OouiForms.Models;
 using Google.Apis.YouTube.v3.Data;
 using Newtonsoft.Json;
-using Microsoft.Azure.CognitiveServices.Language.TextAnalytics.Models;
-using CommentQuality.OouiForms.Models;
 using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace CommentQuality.OouiForms.Stuff
 {
@@ -26,6 +25,7 @@ namespace CommentQuality.OouiForms.Stuff
         private string _commentThreadsRoute = "/video/{videoId}/commentThreads?part={part}&pageToken={pageToken}";
 
         private string _textsentimentAzure = "/text/sentiment/azure";
+        private string _textsentimentGoogle = "/text/sentiment/google";
 
         private string _commentsFromThreadRoute =
             "/video/{parentId}/comments?part={part}&pageToken={pageToken}&textFormat={textFormat}";
@@ -76,11 +76,12 @@ namespace CommentQuality.OouiForms.Stuff
             return JsonConvert.DeserializeObject<CommentListResponse>(responseStr);
         }
 
-        public async Task<SentimentBatchResult> GetTextSentimentAzure(DocumentBatch documentBatch)
+        public async Task<DocumentBatchSentiment> GetTextSentimentAzure(DocumentBatch documentBatch)
         {
             var requestUrl = _baseUrl + _textsentimentAzure;
+            //Console.WriteLine(JsonConvert.SerializeObject(documentBatch, Formatting.Indented));
             var response = await _httpClient.PostAsync(requestUrl,
-                                                       new StringContent(JsonConvert.SerializeObject(documentBatch)));
+                new StringContent(JsonConvert.SerializeObject(documentBatch)));
             if (response.StatusCode != System.Net.HttpStatusCode.OK)
             {
                 throw new Exception(response.ReasonPhrase);
@@ -88,9 +89,22 @@ namespace CommentQuality.OouiForms.Stuff
 
             var responseStr = await response.Content.ReadAsStringAsync();
 
-            return JsonConvert.DeserializeObject<SentimentBatchResult>(responseStr);
-
+            return JsonConvert.DeserializeObject<DocumentBatchSentiment>(responseStr);
         }
 
+        public async Task<DocumentBatchSentiment> GetTextSentimentGoogle(DocumentBatch documentBatch)
+        {
+            var requestUrl = _baseUrl + _textsentimentGoogle;
+            //Console.WriteLine(JsonConvert.SerializeObject(documentBatch, Formatting.Indented));
+            var response = await _httpClient.PostAsync(requestUrl, new StringContent(JsonConvert.SerializeObject(documentBatch)));
+            if (response.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                throw new Exception(response.ReasonPhrase);
+            }
+
+            var responseStr = await response.Content.ReadAsStringAsync();
+
+            return JsonConvert.DeserializeObject<DocumentBatchSentiment>(responseStr);
+        }
     }
 }

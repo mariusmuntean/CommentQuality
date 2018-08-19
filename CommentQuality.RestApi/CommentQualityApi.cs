@@ -1,24 +1,26 @@
-using System.Linq;
-using System.Threading.Tasks;
 using CommentQuality.RestApi.Extensions;
 using CommentQuality.RestApi.Interfaces;
+using CommentQuality.RestApi.Models;
 using CommentQuality.RestApi.Services;
-using Google.Apis.YouTube.v3;
+using CommentQuality.RestApi.Util;
+using Google.Apis.Auth.OAuth2;
+using Google.Cloud.Language.V1;
+using Grpc.Auth;
+using Grpc.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.CognitiveServices.Language.TextAnalytics;
+using Microsoft.Azure.CognitiveServices.Language.TextAnalytics.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
+using Newtonsoft.Json;
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using static Google.Apis.YouTube.v3.CommentsResource.ListRequest;
 using ExecutionContext = Microsoft.Azure.WebJobs.ExecutionContext;
-using Microsoft.Azure.CognitiveServices.Language.TextAnalytics.Models;
-using System.Net.Security;
-using Microsoft.Azure.CognitiveServices.Language.TextAnalytics;
-using CommentQuality.RestApi.Models;
-using System;
-using Newtonsoft.Json;
-using System.IO;
-using System.Net.Http;
 
 namespace CommentQuality.RestApi
 {
@@ -87,7 +89,8 @@ namespace CommentQuality.RestApi
 
         [FunctionName("GetTextSentiment_Azure")]
         public static async Task<IActionResult> GetTextSentimentAzure(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "text/sentiment/azure")]HttpRequest request,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "text/sentiment/azure")]
+            HttpRequest request,
             TraceWriter traceWriter,
             ExecutionContext executionContext
         )
@@ -99,7 +102,7 @@ namespace CommentQuality.RestApi
 
             var documentBatch = JsonConvert.DeserializeObject<DocumentBatch>(await GetBodyAsString(request));
 
-            var documents = documentBatch.Documents.Select((Document doc) => new MultiLanguageInput
+            var documents = documentBatch.Documents.Select((Models.Document doc) => new MultiLanguageInput
             {
                 Id = doc.Id,
                 Language = doc.LanguageCode,
@@ -108,8 +111,8 @@ namespace CommentQuality.RestApi
 
             try
             {
-                var result = await _textAnalyticsClient.SentimentAsync(new MultiLanguageBatchInput(documents));
-
+                var sentimentBatchResult = await _textAnalyticsClient.SentimentAsync(new MultiLanguageBatchInput(documents));
+                var result = DocumentBatchSentimentUtil.FromSentimentBatchResult(sentimentBatchResult);
                 return new OkObjectResult(result);
             }
             catch (Exception ex)
@@ -120,6 +123,43 @@ namespace CommentQuality.RestApi
             }
         }
 
+        [FunctionName("GetTextSentiment_Google")]
+        public static async Task<IActionResult> GetTextSentimentGoogle(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "text/sentiment/google")]
+            HttpRequest request,
+            TraceWriter traceWriter,
+            ExecutionContext executionContext
+        )
+        {
+            var appsettings = new AppSettings(executionContext);
+
+            string bodyString = await GetBodyAsString(request);
+            var documentBatch = JsonConvert.DeserializeObject<DocumentBatch>(bodyString.Trim());
+
+            //var creds = GoogleCredential.FromJson(File.ReadAllText("CommentQulity-19b70adeab44.json"));
+            var creds = GoogleCredential.FromJson(JsonConvert.SerializeObject(appsettings.GoogleCredentialsData));
+            var channelCreds = creds.ToChannelCredentials();
+            var channel = new Channel(LanguageServiceClient.DefaultEndpoint.ToString(), channelCreds);
+
+            var langServiceClient = LanguageServiceClient.Create(channel);
+
+            var analyzeSentimentRequest = GetSentimentAnalysisRequest(documentBatch);
+            var analyzeSentimentResponse = langServiceClient.AnalyzeSentiment(analyzeSentimentRequest);
+
+            var result = DocumentBatchSentimentUtil.FromAnnotatedAnalyzeSentimentResponse(analyzeSentimentResponse);
+            return new ObjectResult(result);
+        }
+
+        private static AnalyzeSentimentRequest GetSentimentAnalysisRequest(DocumentBatch documentBatch)
+        {
+            var document = Google.Cloud.Language.V1.Document.FromPlainText(documentBatch.ToAnnotatedPlainText());
+            var analyzeSentimentRequest = new AnalyzeSentimentRequest
+            {
+                Document = document,
+                EncodingType = EncodingType.Utf16 // Default in C#
+            };
+            return analyzeSentimentRequest;
+        }
 
         private static async Task<string> GetBodyAsString(HttpRequest request)
         {
@@ -128,6 +168,7 @@ namespace CommentQuality.RestApi
             {
                 bodyStr = await bodyStreamReader.ReadToEndAsync();
             }
+
             return bodyStr;
         }
 

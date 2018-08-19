@@ -1,15 +1,12 @@
-﻿using CommentQuality.OouiForms.Models;
+﻿using CommentQuality.OouiForms.Interfaces;
+using CommentQuality.OouiForms.Models;
 using CommentQuality.OouiForms.Services;
 using CommentQuality.OouiForms.Stuff;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-using System.Collections.Immutable;
-using CommentQuality.OouiForms.Interfaces;
 
 namespace CommentQuality.OouiForms.Views
 {
@@ -123,13 +120,15 @@ namespace CommentQuality.OouiForms.Views
             await commentProcessor.ProcessCommentsAsync(entry.Text, (CommentBatchResult commentBatchResult) =>
             {
                 var docsInBatch = commentBatchResult.DocumentBatchSentiment.Documents.Count;
-                var batchSentiment = commentBatchResult.DocumentBatchSentiment.Documents.Sum((arg) => arg.Score) / docsInBatch;
-                var msg = $"Analyzed {commentBatchResult.ProcessedCommentCount} comments from {commentBatchResult.TotalCommentCount}. Average batch score is {batchSentiment}";
-                AppendTextAndScroll(msg);
+                var sentimentAverage = commentBatchResult.DocumentBatchSentiment.Documents.Sum((arg) => arg.Score);
+                var batchSentiment = sentimentAverage / docsInBatch;
 
-                averagesSummed += commentBatchResult.DocumentBatchSentiment.Documents.Sum((arg) => arg.Score);
+                averagesSummed += sentimentAverage;
                 processedCommentsCount += commentBatchResult.DocumentBatchSentiment.Documents.Count;
-            });
+
+                var msg = $"Processed {processedCommentsCount} comments. Current batch score is {batchSentiment}";
+                AppendTextAndScroll(msg);
+            }).ConfigureAwait(true);
 
             var duration = DateTime.UtcNow.Subtract(timeBeforeAnalysis);
             await Task.Delay(500);
@@ -142,15 +141,13 @@ namespace CommentQuality.OouiForms.Views
         {
             //return new DummyDocumentBatchSentimentAnalyzer();
 
-            return new AzureCognitiveServicesDocumentBatchSentimentAnalyzer(restApi);
+            //return new AzureCognitiveServicesDocumentBatchSentimentAnalyzer(restApi);
+            return new GoogleCloudLanguageServiceDocumentBatchSentimentAnalyzer(restApi);
         }
 
         private void AppendTextAndScroll(string text)
         {
-            Device.BeginInvokeOnMainThread(() =>
-            {
-                editor.Text += $"{Environment.NewLine} {text}";
-            });
+            Device.BeginInvokeOnMainThread(() => { editor.Text += $"{Environment.NewLine} {text}"; });
         }
     }
 }

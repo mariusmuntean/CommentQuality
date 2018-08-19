@@ -73,7 +73,7 @@ namespace CommentQuality.OouiForms.Services
                 tasks.Add(newTask);
             }
 
-            await Task.WhenAll(tasks).ConfigureAwait(true);
+            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
     }

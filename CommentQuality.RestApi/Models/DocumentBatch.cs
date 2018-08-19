@@ -1,24 +1,30 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace CommentQuality.RestApi.Models
 {
     /// <summary>
     /// A bunch of comments.
     /// </summary>
-    class DocumentBatch
+    public class DocumentBatch
     {
-        private List<Document> _documents = new List<Document>();
-
         /// <summary>
-        /// A read-only copy of the documents in this batch
+        /// The documents in this batch
         /// </summary>
-        public List<Document> Documents => new List<Document>(_documents.AsReadOnly());
+        [JsonProperty("documents")]
+        public List<Document> Documents
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets the combined length of the text in all documents
         /// </summary>
-        public int TotalDocumentTextLenth => _documents.Sum(document => document.Text.Length);
+        [JsonIgnore]
+        public int TotalDocumentTextLenth => Documents.Sum(document => document.Text.Length);
 
         /// <summary>
         /// Adds a <see cref="Document"/> to the current batch
@@ -26,7 +32,7 @@ namespace CommentQuality.RestApi.Models
         /// <param name="document"></param>
         public void AddDocument(Document document)
         {
-            _documents.Add(document);
+            Documents.Add(document);
         }
     }
 }

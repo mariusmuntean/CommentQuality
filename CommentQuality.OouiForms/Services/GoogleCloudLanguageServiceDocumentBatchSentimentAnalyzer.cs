@@ -6,25 +6,27 @@ using System.Threading.Tasks;
 
 namespace CommentQuality.OouiForms.Services
 {
-    public class AzureCognitiveServicesDocumentBatchSentimentAnalyzer : IDocumentBatchSentimentAnalyzer
+    public class GoogleCloudLanguageServiceDocumentBatchSentimentAnalyzer : IDocumentBatchSentimentAnalyzer
     {
         private readonly RestApi _restApi;
 
-        public AzureCognitiveServicesDocumentBatchSentimentAnalyzer(RestApi restApi)
+        public GoogleCloudLanguageServiceDocumentBatchSentimentAnalyzer(RestApi restApi)
         {
             _restApi = restApi;
         }
 
-        public Task<DocumentBatchSentiment> AnalyzeDocumentBatchAsync(DocumentBatch documentBatch)
+        public async Task<DocumentBatchSentiment> AnalyzeDocumentBatchAsync(DocumentBatch documentBatch)
         {
             try
             {
-                return _restApi.GetTextSentimentAzure(documentBatch);
+                var resonse = await _restApi.GetTextSentimentGoogle(documentBatch);
+
+                return resonse;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"{this.GetType().FullName} threw exception: {ex}");
-                return Task.FromResult(new DocumentBatchSentiment());
+                return new DocumentBatchSentiment();
             }
         }
     }
