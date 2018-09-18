@@ -1,5 +1,5 @@
 ﻿using System;
-using CommentQuality.OouiForms.Stuff;
+using CommentQuality.Core.Stuff;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 

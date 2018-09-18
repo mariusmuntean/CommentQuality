@@ -1,7 +1,7 @@
-﻿using CommentQuality.OouiForms.Interfaces;
-using CommentQuality.OouiForms.Models;
-using CommentQuality.OouiForms.Services;
-using CommentQuality.OouiForms.Stuff;
+﻿using CommentQuality.Core.Interfaces;
+using CommentQuality.Core.Models;
+using CommentQuality.Core.Services;
+using CommentQuality.Core.Stuff;
 using System;
 using System.Linq;
 using System.Threading.Tasks;

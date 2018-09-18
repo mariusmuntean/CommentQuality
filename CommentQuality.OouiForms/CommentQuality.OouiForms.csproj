@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.35.1.1226" />
+    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.35.2.1226" />
     <PackageReference Include="Google.Cloud.Language.V1" Version="1.2.0-beta01" />
     <PackageReference Include="Ooui.Forms" Version="0.10.222" />
     <PackageReference Include="Xamarin.Forms" Version="2.5.0.122203" />
@@ -33,6 +33,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CommentQuality.Shared\CommentQuality.Shared.csproj" />
+    <ProjectReference Include="..\Core\CommentQuality.Core\CommentQuality.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

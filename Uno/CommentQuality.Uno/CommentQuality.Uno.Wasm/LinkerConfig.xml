@@ -1,0 +1,13 @@
+﻿<linker>
+  <assembly fullname="Uno.UI">
+    <type fullname="*" />
+  </assembly>
+  <assembly fullname="System.Core">
+    <!-- This is required by JSon.NET and any expression.Compile caller -->
+    <type fullname="System.Linq.Expressions*" />
+  </assembly>
+
+  <!--Required for debugging-->
+  <assembly fullname="mscorlib">
+  </assembly>
+</linker>

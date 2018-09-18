@@ -1,0 +1,77 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<WasmHead>true</WasmHead>
+		<ApplicationIcon />
+		<StartupObject />
+		<DefineConstants>$(DefineConstants);__WASM__</DefineConstants>
+		<AssemblyName>Uno.Playground.WASM</AssemblyName>
+		<RootNamespace>Uno.Playground.WASM</RootNamespace>
+		<NoWarn>NU1701</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)'!='net46'">
+		<None Include="**\*.xaml" Exclude="bin\**\*.xaml;obj\**\*.xaml" />
+
+		<!-- remove files included by msbuild extras -->
+		<Page Remove="@(Page)" />
+		<Page Include="**\*.xaml" Exclude="bin\**\*.xaml;obj\**\*.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<UpToDateCheckInput Include="**\*.xaml" Exclude="bin\**\*.xaml;obj\**\*.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!--<Content Include="..\Uno.Playground.UWP\Assets\*.png" Link="Assets\%(FileName)%(Extension)" />-->
+		<Content Include="Fonts\winjs-symbols.woff2" />
+		<Content Include="ts\GoogleAnalytics.ts" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="WasmCSS\**\*.css" />
+		<EmbeddedResource Include="WasmScripts\**\*.js" />
+
+		<UpToDateCheckInput Include="ts\**\*" />
+		<UpToDateCheckInput Include="WasmCSS\**\*" />
+		<UpToDateCheckInput Include="WasmScripts\**\*" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<LinkerDescriptor Include="LinkerConfig.xml" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<PackageReference Include="Microsoft.TypeScript.Compiler" Version="3.0.3">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.TypeScript.MSBuild" Version="3.0.3">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+		<PackageReference Include="Uno.UI" Version="1.40.0-dev.350" />
+		<PackageReference Include="Uno.Wasm.Bootstrap" Version="1.0.0-dev.40" />
+		<PackageReference Include="Uno.CodeGen" Version="1.26.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.1.1" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Filter" Version="1.1.2" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\Core\CommentQuality.Core\CommentQuality.Core.csproj" />
+	</ItemGroup>
+
+	<Target Name="CopyPlaygroundFiles" AfterTargets="BuildDist">
+		<ItemGroup>
+			<PlaygroundFiles Include="bin\$(Configuration)\netstandard2.0\dist\**\*.*" />
+		</ItemGroup>
+
+		<Copy SourceFiles="@(PlaygroundFiles)" DestinationFolder="..\Uno.Playground.AspnetShell\wwwroot\%(RecursiveDir)" />
+	</Target>
+
+	<Import Project="..\CommentQuality.Uno.Shared\CommentQuality.Uno.Shared.projitems" Label="Shared" />
+
+</Project>

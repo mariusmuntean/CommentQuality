@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="Fonts.css" />
+<link rel="stylesheet" type="text/css" href="Uno.UI.css" />
+    
+</head>
+<body>
+    <div id="uno-body" class="container-fluid">
+        <p id="loading"><i class="fa fa-refresh fa-spin" style="font-size:14px;margin-right:0.5em;"></i> Loading...</p>
+    </div>
+    <script defer type="text/javascript" src="uno-bootstrap.js"></script>
+    <script type="text/javascript">
+        var assemblies = ["CommentQuality.Core.clr", "Google.Apis.clr", "Google.Apis.Core.clr", "Google.Apis.YouTube.v3.clr", "Microsoft.Extensions.Logging.Abstractions.clr", "Microsoft.Extensions.Logging.clr", "Microsoft.Extensions.Logging.Console.clr", "Microsoft.Extensions.Logging.Filter.clr", "Microsoft.Extensions.Options.clr", "Microsoft.Practices.ServiceLocation.clr", "Mono.Security.clr", "mscorlib.clr", "netstandard.clr", "Newtonsoft.Json.clr", "System.clr", "System.Collections.clr", "System.Collections.Immutable.clr", "System.Core.clr", "System.Data.clr", "System.Diagnostics.Debug.clr", "System.Drawing.clr", "System.Globalization.clr", "System.IO.Compression.clr", "System.Linq.clr", "System.Memory.clr", "System.Net.Http.clr", "System.Numerics.clr", "System.Numerics.Vectors.clr", "System.Reflection.Emit.ILGeneration.clr", "System.Reflection.Emit.Lightweight.clr", "System.Resources.ResourceManager.clr", "System.Runtime.clr", "System.Runtime.Extensions.clr", "System.Runtime.Serialization.clr", "System.Threading.clr", "System.Xml.clr", "System.Xml.Linq.clr", "Uno.clr", "Uno.Core.clr", "Uno.Foundation.clr", "Uno.Playground.WASM.clr", "Uno.UI.clr", "Uno.UI.Wasm.clr", "Uno.Xaml.clr"];
+        document.addEventListener(
+            "DOMContentLoaded",
+            function (event) {
+                unoWasmMain(
+                    "Uno.Playground.WASM",
+                    "Uno.Playground.WASM",
+                    "Program",
+                    "Main",
+                    assemblies,
+                    "managed-8ab8362fa300d0aa79d7325f20f0b7b52f39d9b3",
+                    "clr",
+                    false
+                );
+            }
+        );
+    </script>
+    <script defer type="text/javascript" src="mono.js"></script>
+    <script defer type="text/javascript" src="Uno.UI.js"></script>
+<script defer type="text/javascript" src="AppManifest.js"></script>
+<script defer type="text/javascript" src="FragmentNavigation.js"></script>
+<script defer type="text/javascript" src="GoogleAnalytics.js"></script>
+</body>
+</html>
