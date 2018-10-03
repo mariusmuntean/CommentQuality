@@ -26,7 +26,7 @@ namespace CommentQuality.Core.Services
 
         public async Task ProcessCommentsAsync(string videoId, Action<CommentBatchResult> onCommentBatchResult)
         {
-            var totalCommentCount = int.Parse(await _restApi.GetCommentCount(videoId));
+            var totalCommentCount = int.Parse(await _restApi.GetCommentCount(videoId).ConfigureAwait(false));
             var parallelWorkers = Math.Ceiling(totalCommentCount / 100.0d);
 
             _commentThreadProvider.Init(videoId, "snippet,replies");
@@ -57,7 +57,7 @@ namespace CommentQuality.Core.Services
                         // ToDo: add intermediate step to detect the Text Language, for now assume it is EN
                         docBatch.Documents.ForEach((doc) => doc.LanguageCode = "en");
 
-                        var analysisResult = await _documentBatchSentimentAnalyzer.AnalyzeDocumentBatchAsync(docBatch);
+                        var analysisResult = await _documentBatchSentimentAnalyzer.AnalyzeDocumentBatchAsync(docBatch).ConfigureAwait(false);
 
                         onCommentBatchResult.Invoke(new CommentBatchResult()
                         {

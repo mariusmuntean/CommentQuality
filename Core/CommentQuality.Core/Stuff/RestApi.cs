@@ -41,14 +41,19 @@ namespace CommentQuality.Core.Stuff
         {
             _httpClient = new HttpClient(handler);
         }
+        
+        public RestApi(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
 
         public async Task<string> GetCommentCount(string videoId)
         {
             var requestUrl = _baseUrl + _commentCountRoute
                                  .Replace("{videoId}", videoId);
-            var response = await _httpClient.GetAsync(requestUrl);
+            var response = await _httpClient.GetAsync(requestUrl).ConfigureAwait(false);
 
-            return await response.Content.ReadAsStringAsync();
+            return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         }
 
         public async Task<CommentThreadListResponse> GetCommentThreads(string videoId, string part, string pageToken)
@@ -57,9 +62,9 @@ namespace CommentQuality.Core.Stuff
                                  .Replace("{videoId}", videoId)
                                  .Replace("{part}", part)
                                  .Replace("{pageToken}", pageToken);
-            var response = await _httpClient.GetAsync(requestUrl);
+            var response = await _httpClient.GetAsync(requestUrl).ConfigureAwait(false);
 
-            var responseStr = await response.Content.ReadAsStringAsync();
+            var responseStr = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             return JsonConvert.DeserializeObject<CommentThreadListResponse>(responseStr);
         }
@@ -74,8 +79,8 @@ namespace CommentQuality.Core.Stuff
                                  .Replace("{pageToken}", pageToken)
                                  .Replace("{textFormat}", textFormat);
 
-            var response = await _httpClient.GetAsync(requestUrl);
-            var responseStr = await response.Content.ReadAsStringAsync();
+            var response = await _httpClient.GetAsync(requestUrl).ConfigureAwait(false);
+            var responseStr = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             return JsonConvert.DeserializeObject<CommentListResponse>(responseStr);
         }
@@ -85,13 +90,13 @@ namespace CommentQuality.Core.Stuff
             var requestUrl = _baseUrl + _textsentimentAzure;
             //Console.WriteLine(JsonConvert.SerializeObject(documentBatch, Formatting.Indented));
             var response = await _httpClient.PostAsync(requestUrl,
-                new StringContent(JsonConvert.SerializeObject(documentBatch)));
+                new StringContent(JsonConvert.SerializeObject(documentBatch))).ConfigureAwait(false);
             if (response.StatusCode != System.Net.HttpStatusCode.OK)
             {
                 throw new Exception(response.ReasonPhrase);
             }
 
-            var responseStr = await response.Content.ReadAsStringAsync();
+            var responseStr = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             return JsonConvert.DeserializeObject<DocumentBatchSentiment>(responseStr);
         }
@@ -101,13 +106,13 @@ namespace CommentQuality.Core.Stuff
             var requestUrl = _baseUrl + _textsentimentGoogle;
             //Console.WriteLine(JsonConvert.SerializeObject(documentBatch, Formatting.Indented));
             var response = await _httpClient.PostAsync(requestUrl,
-                new StringContent(JsonConvert.SerializeObject(documentBatch)));
+                new StringContent(JsonConvert.SerializeObject(documentBatch))).ConfigureAwait(false);
             if (response.StatusCode != System.Net.HttpStatusCode.OK)
             {
                 throw new Exception(response.ReasonPhrase);
             }
 
-            var responseStr = await response.Content.ReadAsStringAsync();
+            var responseStr = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             return JsonConvert.DeserializeObject<DocumentBatchSentiment>(responseStr);
         }

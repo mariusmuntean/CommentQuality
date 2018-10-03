@@ -1,0 +1,88 @@
+﻿@page "/commentq1"
+
+@using CommentQuality.Core.Interfaces
+@using CommentQuality.Core.Models
+@using CommentQuality.Core.Services
+@using CommentQuality.Core.Stuff
+
+@inject HttpClient HttpClient
+
+<h1>Comment Quality #1</h1>
+
+<input bind="@videoId" />
+
+<button onclick="@GetComments">Go</button>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Out</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var line in Lines)
+        {
+            <tr>
+                <td>@line</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@functions
+{
+public List<string> Lines { get; set; } = new List<string>();
+
+string videoId = string.Empty;
+
+public async void GetComments()
+{
+    Lines.Clear();
+    Console.WriteLine($"VideoId: {videoId}");
+    await ProcessComments().ConfigureAwait(false);
+}
+
+public async Task ProcessComments()
+{
+    var restApi = new RestApi(HttpClient);
+    var commentThreadIterator = new CommentThreadIterator(restApi);
+    var commentThreadProvider = new CommentThreadProvider(commentThreadIterator);
+
+    var commentProcessor = new CommentProcessor(restApi, commentThreadProvider, NewSentimentAnalyzer(restApi));
+    var timeBeforeAnalysis = DateTime.UtcNow;
+    var averagesSummed = 0.0d;
+    var processedCommentsCount = 0;
+    await commentProcessor.ProcessCommentsAsync(videoId, (CommentBatchResult commentBatchResult) =>
+    {
+        var docsInBatch = commentBatchResult.DocumentBatchSentiment.Documents.Count;
+        var sentimentAverage = commentBatchResult.DocumentBatchSentiment.Documents.Sum((arg) => arg.Score);
+        var batchSentiment = sentimentAverage / docsInBatch;
+
+        averagesSummed += sentimentAverage;
+        processedCommentsCount += commentBatchResult.DocumentBatchSentiment.Documents.Count;
+
+        var msg = $"Processed {processedCommentsCount} comments. Current batch score is {batchSentiment}";
+        AppendTextAndScroll(msg);
+    }).ConfigureAwait(false);
+
+    var duration = DateTime.UtcNow.Subtract(timeBeforeAnalysis);
+    await Task.Delay(500).ConfigureAwait(false);
+    AppendTextAndScroll($"Average sentiment score is {(averagesSummed / processedCommentsCount):0.####}");
+    await Task.Delay(500).ConfigureAwait(false);
+    AppendTextAndScroll($"Sentiment analysis took {duration.TotalSeconds:0.##} seconds");
+}
+
+private static IDocumentBatchSentimentAnalyzer NewSentimentAnalyzer(RestApi restApi)
+{
+    //return new DummyDocumentBatchSentimentAnalyzer();
+
+    //return new AzureCognitiveServicesDocumentBatchSentimentAnalyzer(restApi);
+    return new GoogleCloudLanguageServiceDocumentBatchSentimentAnalyzer(restApi);
+}
+
+private void AppendTextAndScroll(string text)
+{
+    Lines.Add(text);
+}
+
+}

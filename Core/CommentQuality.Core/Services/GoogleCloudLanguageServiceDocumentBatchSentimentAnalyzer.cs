@@ -19,7 +19,7 @@ namespace CommentQuality.Core.Services
         {
             try
             {
-                var resonse = await _restApi.GetTextSentimentGoogle(documentBatch);
+                var resonse = await _restApi.GetTextSentimentGoogle(documentBatch).ConfigureAwait(false);
 
                 return resonse;
             }

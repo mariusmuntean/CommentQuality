@@ -34,6 +34,7 @@ namespace CommentQuality.RestApi
             TraceWriter traceWriter,
             string videoId)
         {
+            traceWriter.Info($"Getting comment count for video ID: {videoId}");
             var appSettings = new AppSettings(context);
             IYouTubeDataApi youtubeDataApi = new YouTubeDataApi(appSettings.YouTubeApiSettings);
 
