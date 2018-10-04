@@ -5,6 +5,7 @@
         Bar,
         Line,
         Pie,
-        Radar
+        Radar,
+        Bubble
     }
 }

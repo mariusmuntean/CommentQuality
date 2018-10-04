@@ -14,6 +14,11 @@ namespace BlazorComponents.ChartJS
         {
             return JSRuntime.Current.InvokeAsync<bool>("BlazorComponents.ChartJSInterop.InitializeBarChart", new[] { barChart });
         }
+        
+        public static Task<bool> InitializeBubbleChart(ChartJSChart<ChartJsBubbleDataset> bubbleChartt)
+        {
+            return JSRuntime.Current.InvokeAsync<bool>("BlazorComponents.ChartJSInterop.InitializeBubbleChart", new[] { bubbleChartt });
+        }
 
         public static Task<bool> UpdateLineChart(ChartJSChart<ChartJsLineDataset> lineChart)
         {
@@ -23,6 +28,11 @@ namespace BlazorComponents.ChartJS
         public static Task<bool> UpdateBarChart(ChartJSChart<ChartJsBarDataset> barChart)
         {
             return JSRuntime.Current.InvokeAsync<bool>("BlazorComponents.ChartJSInterop.UpdateBarChart", new[] { barChart });
+        }
+        
+        public static Task<bool> UpdateBubbleChart(ChartJSChart<ChartJsBubbleDataset> bubbleChart)
+        {
+            return JSRuntime.Current.InvokeAsync<bool>("BlazorComponents.ChartJSInterop.UpdateBubbleChart", new[] { bubbleChart });
         }
 
         public static Task<bool> InitializeRadarChart(ChartJSChart<ChartJSRadarDataset> radarChart)

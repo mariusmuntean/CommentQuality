@@ -11,6 +11,14 @@ window.BlazorComponents.ChartJSInterop = {
             BlazorCharts.push({ id: data.canvasId, chart: thisChart });
 
         return true;
+    },    
+    InitializeBubbleChart: function (data) {
+        let thisChart = initializeChartjsChart(data, 'bubble');
+
+        if (!BlazorCharts.find(currentChart => currentChart.id === data.canvasId))
+            BlazorCharts.push({ id: data.canvasId, chart: thisChart });
+
+        return true;
     },
     InitializeLineChart: function (data) {
         let thisChart = initializeChartjsChart(data, 'line');
@@ -28,6 +36,7 @@ window.BlazorComponents.ChartJSInterop = {
 
         return true;
     },
+
     UpdateLineChart: function (data) {
         if (!BlazorCharts.find(currentChart => currentChart.id === data.canvasId))
             throw `Could not find a chart with the given id. ${data.canvasId}`;
@@ -52,6 +61,20 @@ window.BlazorComponents.ChartJSInterop = {
 
         myChart.chart = {};
         let newChart = initializeChartjsChart(data, 'bar');
+        myChart.chart = newChart;
+
+        return true;
+    },
+    UpdateBubbleChart: function (data) {
+        if (!BlazorCharts.find(currentChart => currentChart.id === data.canvasId))
+            throw `Could not find a chart with the given id. ${data.canvasId}`;
+
+        let myChart = BlazorCharts.find(currentChart => currentChart.id === data.canvasId);
+
+        let myChartIndex = BlazorCharts.findIndex(currentChart => currentChart.id === data.canvasId);
+
+        myChart.chart = {};
+        let newChart = initializeChartjsChart(data, 'bubble');
         myChart.chart = newChart;
 
         return true;

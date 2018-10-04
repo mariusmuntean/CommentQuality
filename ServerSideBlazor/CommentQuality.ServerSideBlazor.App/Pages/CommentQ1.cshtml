@@ -10,30 +10,35 @@
 
 <h1>Comment Quality #1</h1>
 
-@*<input bind="@_videoId" />
+<input bind="@_videoId"/>
 
-    <button onclick="@GetComments">Go</button>
+<button onclick="@GetComments">Go</button>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Out</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var line in Lines)
-            {
-                <tr>
-                    <td>@line</td>
-                </tr>
-            }
-        </tbody>
-    </table>*@
+<table class="table">
+    <thead>
+    <tr>
+        <th>Out</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var line in Lines)
+    {
+        <tr>
+            <td>@line</td>
+        </tr>
+    }
+    </tbody>
+</table>
 
 <div class="row">
     <button class="btn btn-primary" onclick="@UpdateChart">Update Chart </button>
 </div>
 <ChartJsBarChart ref="lineChartJs" Chart="@blazorLineChartJS" Width="600" Height="300"/>
+
+<div class="row">
+    <button class="btn btn-primary" onclick="@UpdateChart">Update Chart </button>
+</div>
+<ChartJsBubbleChart ref="bubbleChartJs" Chart="@blazorBubbleChartJS" Width="600" Height="300"/>
 
 @functions
 {
@@ -42,8 +47,11 @@
     string _videoId = string.Empty;
 
     public ChartJSChart<ChartJsBarDataset> blazorLineChartJS { get; set; } = new ChartJSChart<ChartJsBarDataset>();
-    //ChartJsLineChart lineChartJs;
+    public ChartJSChart<ChartJsBubbleDataset> blazorBubbleChartJS { get; set; } = new ChartJSChart<ChartJsBubbleDataset>();
+
     ChartJsBarChart lineChartJs;
+
+    ChartJsBubbleChart bubbleChartJs;
 
     public async void GetComments()
     {
@@ -102,7 +110,7 @@
     {
         blazorLineChartJS = new ChartJSChart<ChartJsBarDataset>()
         {
-            ChartType = "line",
+            ChartType = "bar",
             CanvasId = "myFirstLineChart",
             Options = new ChartJsOptions()
             {
@@ -120,8 +128,41 @@
                         BackgroundColor = "#ff6384",
                         BorderColor = "#ff6384",
                         Label = "# of Votes from blazor",
-                        Data = new List<int> {19, 12, 5, 3, 3, 2},
+                        Data = new List<dynamic> {19, 12, 5, 3, 3, 2},
                         BorderWidth = 2
+                    }
+                }
+            }
+        };
+
+        blazorBubbleChartJS = new ChartJSChart<ChartJsBubbleDataset>()
+        {
+            ChartType = "bubble",
+            CanvasId = "myFirstBubbleChart",
+            Options = new ChartJsOptions()
+            {
+                BorderWidth = 5,
+                Display = true,
+                Responsive = false,
+                Text = "bubble?"
+            },
+            Data = new ChartJsData<ChartJsBubbleDataset>()
+            {
+                Labels = new List<string> {"a", "b"},
+                Datasets = new List<ChartJsBubbleDataset>
+                {
+                    new ChartJsBubbleDataset
+                    {
+                        Data = new List<dynamic>
+                        {
+                            new BubbleData() {x = 2, y = 2, r = 2},
+                            new BubbleData() {x = 4, y = 4, r = 4}
+                        },
+                        BackgroundColor = "#ff6384",
+                        BorderColor = "#ff6384",
+                        Label = "Bubble",
+                        BorderWidth = 12,
+                        Radius = 4
                     }
                 }
             }
@@ -149,6 +190,7 @@
     //});
 
         lineChartJs.UpdateChart(blazorLineChartJS);
+        bubbleChartJs.UpdateChart(blazorBubbleChartJS);
     }
 
 }
