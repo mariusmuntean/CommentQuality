@@ -1,11 +1,11 @@
-﻿using System;
+﻿using CommentQuality.Core.Interfaces;
+using CommentQuality.Core.Models;
+using CommentQuality.Core.Stuff;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using CommentQuality.Core.Interfaces;
-using CommentQuality.Core.Models;
-using CommentQuality.Core.Stuff;
 
 namespace CommentQuality.Core.Services
 {
@@ -16,8 +16,8 @@ namespace CommentQuality.Core.Services
         private readonly IDocumentBatchSentimentAnalyzer _documentBatchSentimentAnalyzer;
 
         public CommentProcessor(RestApi restApi,
-                                CommentThreadProvider commentThreadProvider,
-                                IDocumentBatchSentimentAnalyzer documentBatchSentimentAnalyzer)
+            CommentThreadProvider commentThreadProvider,
+            IDocumentBatchSentimentAnalyzer documentBatchSentimentAnalyzer)
         {
             this._restApi = restApi;
             this._commentThreadProvider = commentThreadProvider;
@@ -28,6 +28,9 @@ namespace CommentQuality.Core.Services
         {
             var totalCommentCount = int.Parse(await _restApi.GetCommentCount(videoId).ConfigureAwait(false));
             var parallelWorkers = Math.Ceiling(totalCommentCount / 100.0d);
+            parallelWorkers++;
+
+            parallelWorkers = (int) Math.Min(parallelWorkers, 10);
 
             _commentThreadProvider.Init(videoId, "snippet,replies");
 
@@ -57,7 +60,8 @@ namespace CommentQuality.Core.Services
                         // ToDo: add intermediate step to detect the Text Language, for now assume it is EN
                         docBatch.Documents.ForEach((doc) => doc.LanguageCode = "en");
 
-                        var analysisResult = await _documentBatchSentimentAnalyzer.AnalyzeDocumentBatchAsync(docBatch).ConfigureAwait(false);
+                        var analysisResult = await _documentBatchSentimentAnalyzer.AnalyzeDocumentBatchAsync(docBatch)
+                            .ConfigureAwait(false);
 
                         onCommentBatchResult.Invoke(new CommentBatchResult()
                         {
@@ -68,13 +72,13 @@ namespace CommentQuality.Core.Services
 
                         docBatch = docBatchProvider2.GetNextDocumentBatch();
                     }
-                    Console.WriteLine($"{Task.CurrentId} ended");
+
+                    Console.WriteLine($"Task {Task.CurrentId} ended");
                 });
                 tasks.Add(newTask);
             }
 
             await Task.WhenAll(tasks).ConfigureAwait(false);
         }
-
     }
 }

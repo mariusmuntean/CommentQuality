@@ -39,6 +39,7 @@ namespace CommentQuality.ServerSideBlazor.Server
 
             // Use component registrations and static files from the app project.
             app.UseServerSideBlazor<App.Startup>();
+            //app.UseBlazor<App.Startup>();
         }
     }
 }

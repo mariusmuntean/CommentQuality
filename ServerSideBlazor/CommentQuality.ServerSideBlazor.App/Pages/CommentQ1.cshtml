@@ -1,5 +1,6 @@
 ﻿@page "/commentq1"
 
+@using BlazorComponents.Shared
 @using CommentQuality.Core.Interfaces
 @using CommentQuality.Core.Models
 @using CommentQuality.Core.Services
@@ -9,31 +10,40 @@
 
 <h1>Comment Quality #1</h1>
 
-<input bind="@_videoId"/>
+@*<input bind="@_videoId" />
 
-<button onclick="@GetComments">Go</button>
+    <button onclick="@GetComments">Go</button>
 
-<table class="table">
-    <thead>
-    <tr>
-        <th>Out</th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var line in Lines)
-    {
-        <tr>
-            <td>@line</td>
-        </tr>
-    }
-    </tbody>
-</table>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Out</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var line in Lines)
+            {
+                <tr>
+                    <td>@line</td>
+                </tr>
+            }
+        </tbody>
+    </table>*@
+
+<div class="row">
+    <button class="btn btn-primary" onclick="@UpdateChart">Update Chart </button>
+</div>
+<ChartJsBarChart ref="lineChartJs" Chart="@blazorLineChartJS" Width="600" Height="300"/>
 
 @functions
 {
     List<string> Lines { get; set; } = new List<string>();
 
     string _videoId = string.Empty;
+
+    public ChartJSChart<ChartJsBarDataset> blazorLineChartJS { get; set; } = new ChartJSChart<ChartJsBarDataset>();
+    //ChartJsLineChart lineChartJs;
+    ChartJsBarChart lineChartJs;
 
     public async void GetComments()
     {
@@ -44,7 +54,7 @@
 
     public async Task ProcessComments()
     {
-        //var restApi = new RestApi(HttpClient);    
+    //var restApi = new RestApi(HttpClient);
         var restApi = new RestApi();
         var commentThreadIterator = new CommentThreadIterator(restApi);
         var commentThreadProvider = new CommentThreadProvider(commentThreadIterator);
@@ -62,7 +72,7 @@
             averagesSummed += sentimentAverage;
             processedCommentsCount += commentBatchResult.DocumentBatchSentiment.Documents.Count;
 
-            var msg = $"Processed {processedCommentsCount} comments. Current batch score is {batchSentiment}";
+            var msg = $"Processed {commentBatchResult.ProcessedCommentCount} from {commentBatchResult.TotalCommentCount} comments.";
             AppendTextAndScroll(msg);
         }).ConfigureAwait(false);
 
@@ -77,14 +87,68 @@
     {
         return new DummyDocumentBatchSentimentAnalyzer();
 
-        //return new AzureCognitiveServicesDocumentBatchSentimentAnalyzer(restApi);
-        //return new GoogleCloudLanguageServiceDocumentBatchSentimentAnalyzer(restApi);
+    //return new AzureCognitiveServicesDocumentBatchSentimentAnalyzer(restApi);
+    //return new GoogleCloudLanguageServiceDocumentBatchSentimentAnalyzer(restApi);
     }
 
     private void AppendTextAndScroll(string text)
     {
         Lines.Add(text);
+        Console.WriteLine($"Printing: '{text}'");
         this.StateHasChanged();
+    }
+
+    protected override void OnInit()
+    {
+        blazorLineChartJS = new ChartJSChart<ChartJsBarDataset>()
+        {
+            ChartType = "line",
+            CanvasId = "myFirstLineChart",
+            Options = new ChartJsOptions()
+            {
+                Text = "Sample chart from Blazor",
+                Display = true,
+                Responsive = false
+            },
+            Data = new ChartJsData<ChartJsBarDataset>()
+            {
+                Labels = new List<string>() {"Red", "Blue", "Yellow", "Green", "Purple", "Orange"},
+                Datasets = new List<ChartJsBarDataset>()
+                {
+                    new ChartJsBarDataset()
+                    {
+                        BackgroundColor = "#ff6384",
+                        BorderColor = "#ff6384",
+                        Label = "# of Votes from blazor",
+                        Data = new List<int> {19, 12, 5, 3, 3, 2},
+                        BorderWidth = 2
+                    }
+                }
+            }
+        };
+    }
+
+    public void UpdateChart()
+    {
+    //Update existing dataset
+        blazorLineChartJS.Data.Labels.Add($"New{DateTime.Now.Second}");
+        var firstDataSet = blazorLineChartJS.Data.Datasets[0];
+        firstDataSet.Data.Add(DateTime.Now.Second);
+
+    //Add new dataset
+    //blazorLineChartJS.Data.Datasets.Add(new ChartJsLineDataset()
+    //{
+    //    BackgroundColor = "#cc65fe",
+    //    BorderColor = "#cc65fe",
+    //    Label = "# of Votes from blazor 1",
+    //    Data = new List<int> {20,21,12,3,4,4},
+    //    Fill = true,
+    //    BorderWidth = 2,
+    //    PointRadius = 3,
+    //    PointBorderWidth = 1
+    //});
+
+        lineChartJs.UpdateChart(blazorLineChartJS);
     }
 
 }
