@@ -1,18 +1,24 @@
 ﻿@page "/commentq1"
 
-@using BlazorComponents.Shared
 @using CommentQuality.Core.Interfaces
 @using CommentQuality.Core.Models
 @using CommentQuality.Core.Services
 @using CommentQuality.Core.Stuff
+@using ChartJs.Blazor.ChartJS
+@using ChartJs.Blazor.Shared
 
 @*@inject HttpClient HttpClient*@
 
 <h1>Comment Quality #1</h1>
 
 <input bind="@_videoId"/>
-
 <button onclick="@GetComments">Go</button>
+
+
+<div class="row" style="margin: 10px 0px">
+    <button class="btn btn-primary" onclick="@UpdateChart">Update Chart </button>
+</div>
+<ChartJsDoughnutChart ref="_doughnutChart" Chart="@BlazorDoughnutChart" Width="600" Height="300"/>
 
 <table class="table">
     <thead>
@@ -30,15 +36,6 @@
     </tbody>
 </table>
 
-<div class="row">
-    <button class="btn btn-primary" onclick="@UpdateChart">Update Chart </button>
-</div>
-<ChartJsBarChart ref="lineChartJs" Chart="@blazorLineChartJS" Width="600" Height="300"/>
-
-<div class="row">
-    <button class="btn btn-primary" onclick="@UpdateChart">Update Chart </button>
-</div>
-<ChartJsBubbleChart ref="bubbleChartJs" Chart="@blazorBubbleChartJS" Width="600" Height="300"/>
 
 @functions
 {
@@ -46,12 +43,12 @@
 
     string _videoId = string.Empty;
 
-    public ChartJSChart<ChartJsBarDataset> blazorLineChartJS { get; set; } = new ChartJSChart<ChartJsBarDataset>();
-    public ChartJSChart<ChartJsBubbleDataset> blazorBubbleChartJS { get; set; } = new ChartJSChart<ChartJsBubbleDataset>();
 
-    ChartJsBarChart lineChartJs;
+    public ChartJSChart BlazorDoughnutChart { get; set; }
+    ChartJsDoughnutChart _doughnutChart;
 
-    ChartJsBubbleChart bubbleChartJs;
+    public List<double> CommentSentiments { get; set; } = new List<double>();
+
 
     public async void GetComments()
     {
@@ -77,6 +74,9 @@
             var sentimentAverage = commentBatchResult.DocumentBatchSentiment.Documents.Sum((arg) => arg.Score);
             var batchSentiment = sentimentAverage / docsInBatch;
 
+            CommentSentiments.AddRange(commentBatchResult.DocumentBatchSentiment.Documents.Select(sentiment => sentiment.Score));
+            UpdateChart();
+
             averagesSummed += sentimentAverage;
             processedCommentsCount += commentBatchResult.DocumentBatchSentiment.Documents.Count;
 
@@ -86,7 +86,7 @@
 
         var duration = DateTime.UtcNow.Subtract(timeBeforeAnalysis);
         await Task.Delay(500).ConfigureAwait(false);
-        AppendTextAndScroll($"Average sentiment score is {(averagesSummed / processedCommentsCount):0.####}");
+        AppendTextAndScroll($"Average sentiment score is {averagesSummed / processedCommentsCount:0.####}");
         await Task.Delay(500).ConfigureAwait(false);
         AppendTextAndScroll($"Sentiment analysis took {duration.TotalSeconds:0.##} seconds");
     }
@@ -108,89 +108,55 @@
 
     protected override void OnInit()
     {
-        blazorLineChartJS = new ChartJSChart<ChartJsBarDataset>()
+        var yayColor = "#56B4E9";
+        var nayColor = "#ff6384";
+        BlazorDoughnutChart = BlazorDoughnutChart ?? new ChartJSChart()
         {
-            ChartType = "bar",
-            CanvasId = "myFirstLineChart",
+            ChartType = ChartTypes.LINE.ToString(),
+            CanvasId = "Line chart",
             Options = new ChartJsOptions()
             {
-                Text = "Sample chart from Blazor",
                 Display = true,
-                Responsive = false
+                Text = "Options text",
+                Responsive = true
             },
-            Data = new ChartJsData<ChartJsBarDataset>()
+            Data = new ChartJsData()
             {
-                Labels = new List<string>() {"Red", "Blue", "Yellow", "Green", "Purple", "Orange"},
-                Datasets = new List<ChartJsBarDataset>()
+                Labels = new List<string>() {"Nay!", "Yay!"},
+                Datasets = new List<ChartJsDataset>
                 {
-                    new ChartJsBarDataset()
+                    new ChartJsDoughnutDataset
                     {
-                        BackgroundColor = "#ff6384",
-                        BorderColor = "#ff6384",
-                        Label = "# of Votes from blazor",
-                        Data = new List<dynamic> {19, 12, 5, 3, 3, 2},
-                        BorderWidth = 2
-                    }
-                }
-            }
-        };
-
-        blazorBubbleChartJS = new ChartJSChart<ChartJsBubbleDataset>()
-        {
-            ChartType = "bubble",
-            CanvasId = "myFirstBubbleChart",
-            Options = new ChartJsOptions()
-            {
-                BorderWidth = 5,
-                Display = true,
-                Responsive = false,
-                Text = "bubble?"
-            },
-            Data = new ChartJsData<ChartJsBubbleDataset>()
-            {
-                Labels = new List<string> {"a", "b"},
-                Datasets = new List<ChartJsBubbleDataset>
-                {
-                    new ChartJsBubbleDataset
-                    {
+                        BackgroundColor = new[] {nayColor, yayColor},
+                        Label = "Comment Opinion",
                         Data = new List<dynamic>
                         {
-                            new BubbleData() {x = 2, y = 2, r = 2},
-                            new BubbleData() {x = 4, y = 4, r = 4}
+                            1, 1
                         },
-                        BackgroundColor = "#ff6384",
-                        BorderColor = "#ff6384",
-                        Label = "Bubble",
-                        BorderWidth = 12,
-                        Radius = 4
+                        BorderWidth = 0,
+                        HoverBackgroundColor = new[] {nayColor, yayColor},
+                        HoverBorderColor = new[] {nayColor, yayColor},
+                        HoverBorderWidth = new[] {1, 1},
+                        BorderColor = new[] {"#ffffff", "#ffffff"}
                     }
                 }
             }
         };
     }
 
+    protected override void OnAfterRender()
+    {
+        _doughnutChart.UpdateChart(BlazorDoughnutChart);
+    }
+
     public void UpdateChart()
     {
-    //Update existing dataset
-        blazorLineChartJS.Data.Labels.Add($"New{DateTime.Now.Second}");
-        var firstDataSet = blazorLineChartJS.Data.Datasets[0];
-        firstDataSet.Data.Add(DateTime.Now.Second);
+        var chartJsDoughnutDataset = BlazorDoughnutChart.Data.Datasets.First() as ChartJsDoughnutDataset;
 
-    //Add new dataset
-    //blazorLineChartJS.Data.Datasets.Add(new ChartJsLineDataset()
-    //{
-    //    BackgroundColor = "#cc65fe",
-    //    BorderColor = "#cc65fe",
-    //    Label = "# of Votes from blazor 1",
-    //    Data = new List<int> {20,21,12,3,4,4},
-    //    Fill = true,
-    //    BorderWidth = 2,
-    //    PointRadius = 3,
-    //    PointBorderWidth = 1
-    //});
-
-        lineChartJs.UpdateChart(blazorLineChartJS);
-        bubbleChartJs.UpdateChart(blazorBubbleChartJS);
+        var nays = CommentSentiments.Count(d => d < 0.5);
+        var yays = CommentSentiments.Count(d => d >= 0.5);
+        chartJsDoughnutDataset.Data.Clear();
+        chartJsDoughnutDataset.Data.AddRange(new List<dynamic> {nays, yays});
     }
 
 }

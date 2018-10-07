@@ -13,18 +13,18 @@ namespace CommentQuality.Core.Services
 
         public Task<DocumentBatchSentiment> AnalyzeDocumentBatchAsync(DocumentBatch documentBatch)
         {
-            var docbatchSentiment = new DocumentBatchSentiment();
+            var docBatchSentiment = new DocumentBatchSentiment();
             var rnd = new Random();
             foreach (var doc in documentBatch.Documents)
             {
-                docbatchSentiment.Documents.Add(new DocumentSentiment()
+                docBatchSentiment.Documents.Add(new DocumentSentiment()
                 {
                     Id = doc.Id,
-                    Score = DateTime.Now.Second % 20 == 0 ? 0.5 : rnd.NextDouble()
+                    Score = rnd.NextDouble()
                 });
             }
 
-            return Task.FromResult(docbatchSentiment);
+            return Task.FromResult(docBatchSentiment);
         }
     }
 }
